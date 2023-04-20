@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const kPrimaryColor = Color(0xFF232248);
 const kSecondaryColor = Color(0xFFFFFFFF);
 const kButtonColor = Color(0xFF517CF0);
+const kCompColor = Color(0xFFD9D9D9);
 
 const kDefaultPadding = 20.0;
 
@@ -23,3 +24,6 @@ const kDefaultShadow = BoxShadow(
   blurRadius: 4,
   color: Colors.black26,
 );
+
+const Description =
+    'Split expenses with ease! Our app simplifies cost calculation for shared items among friends.';
