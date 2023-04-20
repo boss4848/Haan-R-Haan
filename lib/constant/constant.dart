@@ -4,6 +4,7 @@ const kPrimaryColor = Color(0xFF232248);
 const kSecondaryColor = Color(0xFFFFFFFF);
 const kButtonColor = Color(0xFF517CF0);
 const kCompColor = Color(0xFFD9D9D9);
+const kMemberCardColor = Color(0xFF96A362);
 
 const kDefaultPadding = 20.0;
 

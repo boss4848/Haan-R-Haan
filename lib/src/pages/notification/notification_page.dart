@@ -10,11 +10,14 @@ class NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kPrimaryColor,
-      body: Row(
-        children: const [
-          arrowBack(),
-          Text("Notification"),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.only(top: 50, bottom: 20),
+        child: Row(
+          children: const [
+            arrowBack(),
+            Text("Notification"),
+          ],
+        ),
       ),
     );
   }

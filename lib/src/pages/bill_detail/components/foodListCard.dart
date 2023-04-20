@@ -19,25 +19,25 @@ class foodListCard extends StatelessWidget {
           color: kCompColor),
       child: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 20,
           ),
           Text(foodList,
-              style: TextStyle(
+              style: const TextStyle(
                   color: kPrimaryColor,
                   fontFamily: 'Kanit',
                   fontSize: 20,
                   fontWeight: FontWeight.w600)),
-          Spacer(),
+          const Spacer(),
           Text(
             '${foodPrice.toStringAsFixed(2)}฿',
-            style: TextStyle(
+            style: const TextStyle(
                 color: kPrimaryColor,
                 fontSize: 20,
                 fontFamily: 'Kanit',
                 fontWeight: FontWeight.w600),
           ),
-          SizedBox(
+          const SizedBox(
             width: 20,
           ),
         ],

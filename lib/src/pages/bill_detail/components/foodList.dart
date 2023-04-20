@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/components/MemberAndBill.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/components/promptPay.dart';
 import '../../../../constant/constant.dart';
 import '../../../models/mockup_data.dart';
 import 'foodListCard.dart';
@@ -26,7 +28,7 @@ class _FoodListState extends State<FoodList> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 35),
+          padding: const EdgeInsets.all(kDefaultPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
@@ -41,13 +43,13 @@ class _FoodListState extends State<FoodList> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: const EdgeInsets.only(
-                    top: kDefaultPadding / 4, bottom: kDefaultPadding / 2),
+                margin:
+                    const EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
                 child: Column(
                   children: List.generate(
                     foodListToShow,
                     (index) => Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
+                      padding: const EdgeInsets.symmetric(vertical: 5),
                       child: foodListCard(
                         foodList: widget.party.foodName[index],
                         foodPrice: widget.party.foodPrice[index],
@@ -58,7 +60,7 @@ class _FoodListState extends State<FoodList> {
               ),
               if (foodListLength > 3)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     if (!showAll)
                       TextButton(
@@ -69,11 +71,12 @@ class _FoodListState extends State<FoodList> {
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Text(
                               '...',
                               style: TextStyle(
                                 color: Colors.white,
+                                fontFamily: 'SFTHONBURI',
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -81,11 +84,12 @@ class _FoodListState extends State<FoodList> {
                               height: 10,
                             ),
                             Text(
-                              'Show all lists',
+                              'Show more',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  color: Colors.white,
+                                  fontFamily: 'SFTHONBURI',
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline),
                             ),
                           ],
                         ),
@@ -97,12 +101,13 @@ class _FoodListState extends State<FoodList> {
                             showAll = false;
                           });
                         },
-                        child: Text(
+                        child: const Text(
                           'Show less',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              color: Colors.white,
+                              fontFamily: 'SFTHONBURI',
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
                         ),
                       ),
                   ],
@@ -117,6 +122,14 @@ class _FoodListState extends State<FoodList> {
                       fontWeight: FontWeight.w300),
                 ),
               ),
+              SizedBox(
+                height: kDefaultPadding,
+              ),
+              MemberAndExpenses(allMember: widget.party.allMember),
+              SizedBox(
+                height: kDefaultPadding,
+              ),
+              PromptpatPayment()
             ],
           ),
         ),

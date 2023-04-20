@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/components/MemberAndBill.dart';
 import 'package:haan_r_haan/src/pages/bill_detail/components/partyName.dart';
 
 import '../../../../constant/constant.dart';
@@ -22,7 +23,7 @@ class _BbodyState extends State<Bbody> {
           PartyBar(party: parties[0]),
           FoodList(
             party: parties[0],
-          )
+          ),
         ],
       ),
     );

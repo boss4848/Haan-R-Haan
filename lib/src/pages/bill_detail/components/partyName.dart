@@ -16,13 +16,19 @@ class PartyBar extends StatelessWidget {
           arrowBack(),
           Padding(
             padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              party.partyName,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 35,
-                  fontFamily: 'SFTHONBURI',
-                  fontWeight: FontWeight.w600),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  party.partyName,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 35,
+                      fontFamily: 'SFTHONBURI',
+                      fontWeight: FontWeight.w600),
+                ),
+                Text('by ' + party.owner)
+              ],
             ),
           )
         ],
