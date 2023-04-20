@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
 
-import '../bill_detail/billPage.dart';
+import '../bill_detail/bill_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

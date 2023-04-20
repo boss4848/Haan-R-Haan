@@ -22,12 +22,12 @@ class foodListCard extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 10,
+            width: 20,
           ),
           Text(foodList,
               style: TextStyle(
                   color: kPrimaryColor,
-                  fontFamily: 'SFTHONBURI',
+                  fontFamily: 'Kanit',
                   fontSize: 20,
                   fontWeight: FontWeight.w600)),
           Spacer(),
@@ -40,7 +40,7 @@ class foodListCard extends StatelessWidget {
                 fontWeight: FontWeight.w600),
           ),
           SizedBox(
-            width: 10,
+            width: 20,
           ),
         ],
       ),

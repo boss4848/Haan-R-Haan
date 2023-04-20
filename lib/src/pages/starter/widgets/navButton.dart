@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/pages/main/main_page.dart';
 
 import '../../../../constant/constant.dart';
-import '../../bill_detail/billPage.dart';
+import '../../bill_detail/bill_page.dart';
 
 class NavButton extends StatelessWidget {
   const NavButton({super.key});

@@ -21,7 +21,7 @@ class FoodList extends StatelessWidget {
           style: TextStyle(
               color: Colors.white,
               fontSize: 20,
-              fontFamily: 'SFTHONBURI',
+              fontFamily: 'Inter',
               fontWeight: FontWeight.w600),
         ),
         Container(

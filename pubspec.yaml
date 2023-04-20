@@ -36,3 +36,10 @@ flutter:
        weight: 400
      - asset: assets/fonts/SFTHONBURI-BOLD.TTF
        weight: 700
+  - family: Inter
+    fonts:
+     - asset: assets/fonts/Inter-Regular.ttf
+     - asset: assets/fonts/Inter-Bold.ttf
+       weight: 400
+     - asset: assets/fonts/Inter-ExtraBold.ttf
+       weight: 700
