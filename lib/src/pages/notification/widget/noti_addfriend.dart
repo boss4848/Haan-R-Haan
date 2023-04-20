@@ -3,11 +3,11 @@ import 'package:flutter/src/widgets/placeholder.dart';
 
 import 'package:flutter/material.dart';
 
-class NotiGroup extends StatelessWidget {
+class NotiFriend extends StatelessWidget {
   final String name;
   final String time;
 
-  const NotiGroup({super.key, required this.name, required this.time});
+  const NotiFriend({super.key, required this.name, required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class NotiGroup extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("$name joined your party",style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
+              Text("$name added your friend",style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
               Text(time, style: const TextStyle(color: Colors.black),)
             ],
           ),
