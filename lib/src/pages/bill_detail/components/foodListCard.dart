@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import '../../../../constant/constant.dart';
 import '../../../models/mockup_data.dart';
@@ -13,7 +11,7 @@ class foodListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 350,
+      // width: 400,
       height: 90,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
@@ -36,7 +34,7 @@ class foodListCard extends StatelessWidget {
             style: TextStyle(
                 color: kPrimaryColor,
                 fontSize: 20,
-                fontFamily: 'SFTHONBURI',
+                fontFamily: 'Kanit',
                 fontWeight: FontWeight.w600),
           ),
           SizedBox(
