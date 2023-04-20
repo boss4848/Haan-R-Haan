@@ -5,8 +5,17 @@ import 'package:haan_r_haan/src/pages/notification/notification_page.dart';
 
 import 'widget/partyList.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool showOwner = true;
+  bool showMember = true;
+
   signOut() async {
     await FirebaseAuth.instance.signOut();
   }
@@ -167,18 +176,20 @@ class HomePage extends StatelessWidget {
                                 style: TextStyle(color: Colors.white),
                               ),
                               IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.expand_more,
+                                  onPressed: () { setState(() {
+                                    showOwner = !showOwner;
+                                  }); },
+                                  icon: Icon(
+                                    showOwner ? Icons.expand_less : Icons.expand_more,
                                     color: Colors.white,
                                   )),
                             ],
                           ),
-                          const PartyWidget(
+                          showOwner ? const PartyWidget(
                               name: "Party name1",
                               people: "8",
                               date: "Tue 18 Apr 22:26",
-                              money: "200")
+                              money: "200") : const SizedBox(height: 0,)
                         ]),
                     const SizedBox(
                       height: 10,
@@ -190,17 +201,20 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "As Owner",
+                                "As Member",
                                 style: TextStyle(color: Colors.white),
                               ),
                               IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.expand_more,
+                                  onPressed: () {setState(() {
+                                    showMember = !showMember;
+                                  });},
+                                  icon: Icon(
+                                    showMember ? Icons.expand_less : Icons.expand_more,
                                     color: Colors.white,
                                   )),
                             ],
                           ),
+                          showMember ?
                           Wrap(
                             runSpacing: 20,
                               children: const [
@@ -215,7 +229,7 @@ class HomePage extends StatelessWidget {
                                     date: "Tue 18 Apr 22:26",
                                     money: "200"),
                               ],
-                            ),
+                            ) : const SizedBox()
                         ]),
                         const SizedBox(height: 20,),
                         ElevatedButton(onPressed: signOut, child: const Text("Sign out")),
@@ -223,6 +237,6 @@ class HomePage extends StatelessWidget {
                 )
               ],
             )),
-      );
+      );;
   }
 }
