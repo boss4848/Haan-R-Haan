@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/constant/constant.dart';
+import 'package:intl/intl.dart';
 
-import '../../../models/mockup_data.dart';
+import '../../../models/billDetail_models.dart';
 import 'arrowBack.dart';
 
 class PartyBar extends StatelessWidget {
@@ -9,25 +11,55 @@ class PartyBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat('EEE, MMMM d, y');
+    final timeFormat = DateFormat('HH:mm');
+
+    //final timeFormat = DateFormat('h:mm a');
+
     return Padding(
       padding: const EdgeInsets.only(top: 50, bottom: 20),
       child: Row(
         children: [
           arrowBack(),
           Padding(
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: kDefaultPadding / 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  party.partyName,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 35,
-                      fontFamily: 'SFTHONBURI',
-                      fontWeight: FontWeight.w600),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      party.partyName,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 35,
+                          fontFamily: 'Kanit',
+                          fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('by ${party.owner}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontFamily: 'Kanit',
+                            fontWeight: FontWeight.w300)),
+                  ],
                 ),
-                Text('by ' + party.owner)
+                Row(
+                  children: [
+                    Text(
+                        'Created on ${dateFormat.format(party.dateAndTime)} at ${timeFormat.format(party.dateAndTime)}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'SFTHONBURI',
+                        )),
+                  ],
+                )
               ],
             ),
           )

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/models/mockup_data.dart';
+import 'package:haan_r_haan/src/models/billDetail_models.dart';
 import 'package:promptpay_qrcode_generate/promptpay_qrcode_generate.dart';
 
 import '../../../../constant/constant.dart';

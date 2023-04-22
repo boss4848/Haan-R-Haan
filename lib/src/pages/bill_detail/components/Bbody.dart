@@ -3,7 +3,7 @@ import 'package:haan_r_haan/src/pages/bill_detail/components/MemberAndBill.dart'
 import 'package:haan_r_haan/src/pages/bill_detail/components/partyName.dart';
 
 import '../../../../constant/constant.dart';
-import '../../../models/mockup_data.dart';
+import '../../../models/billDetail_models.dart';
 import 'foodList.dart';
 
 class Bbody extends StatefulWidget {
@@ -21,8 +21,13 @@ class _BbodyState extends State<Bbody> {
       child: Column(
         children: [
           PartyBar(party: parties[0]),
-          FoodList(
-            party: parties[0],
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: FoodList(
+                party: parties[0],
+              ),
+            ),
           ),
         ],
       ),

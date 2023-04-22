@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
-import 'package:haan_r_haan/src/models/mockup_data.dart';
+import 'package:haan_r_haan/src/models/billDetail_models.dart';
 
 class MemberAndExpenses extends StatelessWidget {
   final List allMember;
