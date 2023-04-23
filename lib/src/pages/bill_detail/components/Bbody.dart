@@ -17,7 +17,7 @@ class _BbodyState extends State<Bbody> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(gradient: kDefaultBG),
+      decoration: const BoxDecoration(gradient: kDefaultBG),
       child: Column(
         children: [
           PartyBar(party: parties[0]),

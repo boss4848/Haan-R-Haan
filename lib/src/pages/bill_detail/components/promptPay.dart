@@ -23,8 +23,15 @@ class PromptpatPayment extends StatelessWidget {
         const SizedBox(
           height: kDefaultPadding,
         ),
-        PromptPayQRCOde(
-          party: parties[0],
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            // ignore: prefer_const_constructors
+            decoration: BoxDecoration(boxShadow: const [kDefaultShadow]),
+            child: PromptPayQRCOde(
+              party: parties[0],
+            ),
+          ),
         )
       ],
     );

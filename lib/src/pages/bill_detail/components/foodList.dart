@@ -111,22 +111,25 @@ class _FoodListState extends State<FoodList> {
             ),
           Container(
             alignment: Alignment.centerRight,
-            child: Text(
-              'Total : ' + '${widget.party.totalPrice.toStringAsFixed(2)}฿',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w400),
+            child: Padding(
+              padding: const EdgeInsets.all(kDefaultPadding / 2),
+              child: Text(
+                'Total : ' + '${widget.party.totalPrice.toStringAsFixed(2)}฿',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w500),
+              ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: kDefaultPadding,
           ),
           MemberAndExpenses(allMember: widget.party.allMember),
-          SizedBox(
+          const SizedBox(
             height: kDefaultPadding,
           ),
-          PromptpatPayment()
+          const PromptpatPayment()
         ],
       ),
     );
