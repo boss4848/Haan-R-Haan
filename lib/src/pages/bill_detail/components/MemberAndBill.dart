@@ -99,7 +99,7 @@ class _MemberCheckboxState extends State<MemberCheckbox> {
       if (states.any(interactiveStates.contains)) {
         return Colors.blue;
       }
-      return const Color(0xFF96A362);
+      return const Color(0xFFD39494);
     }
 
     return Row(

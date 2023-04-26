@@ -7,8 +7,11 @@ import 'arrowBack.dart';
 
 class PartyBar extends StatelessWidget {
   final Party party;
-  const PartyBar({super.key, required this.party});
 
+  const PartyBar({
+    super.key,
+    required this.party,
+  });
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('EEE, MMMM d, y');
@@ -16,11 +19,10 @@ class PartyBar extends StatelessWidget {
 
     //final timeFormat = DateFormat('h:mm a');
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 50, bottom: 20),
+    return SafeArea(
       child: Row(
         children: [
-          arrowBack(),
+          const arrowBack(),
           Padding(
             padding: const EdgeInsets.only(left: kDefaultPadding / 2),
             child: Column(
@@ -32,13 +34,9 @@ class PartyBar extends StatelessWidget {
                   children: [
                     Text(
                       party.partyName,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 35,
-                          fontFamily: 'Kanit',
-                          fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
                     Text('by ${party.owner}',
