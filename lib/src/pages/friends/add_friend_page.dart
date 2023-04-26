@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/components/arrowBack.dart';
 import 'package:haan_r_haan/src/pages/friends/friends_page.dart';
 import 'package:haan_r_haan/src/pages/friends/components/searchBox.dart';
 
@@ -16,19 +17,19 @@ class AddFriendPage extends StatelessWidget {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(65, 70, 0, 0),
+              padding: const EdgeInsets.fromLTRB(60, 55, 0, 0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Align(
+                children: const [
+                  Align(
                     alignment: Alignment.topLeft,
                     child: Text(
                       "Add Friend",
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -36,22 +37,12 @@ class AddFriendPage extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: 65,
+              top: 50,
               left: 15,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                color: Colors.white,
-                iconSize: 26,
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                    MaterialPageRoute(builder: (context) => FriendsPage()),
-                  );
-                },
-              ),
+              child: arrowBack()
             ),
             Positioned(
-              top: 120,
+              top: 100,
               left: 20,
               right: 20,
               child: SearchBox(
@@ -59,11 +50,6 @@ class AddFriendPage extends StatelessWidget {
                   // Handle search text changes here
                 },
               ),
-            ),
-            Divider(
-              height: 380,
-              thickness: 2,
-              color: Colors.white.withOpacity(0.5),
             ),
           ],
         ),
