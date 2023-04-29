@@ -4,6 +4,8 @@ import 'package:haan_r_haan/constant/constant.dart';
 import 'package:haan_r_haan/src/pages/login/widgets/button.dart';
 import 'package:haan_r_haan/src/pages/login/widgets/input_field.dart';
 
+import '../sign_up/sign_up_page.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -107,7 +109,13 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return const SignUpPage();
+                        },
+                      ));
+                    },
                     child: const Text("Sign up"),
                   ),
                   TextButton(
