@@ -51,33 +51,38 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         textTheme: const TextTheme(
-            bodyMedium: TextStyle(
-              color: Colors.white,
-            ),
-            headlineLarge: TextStyle(
-                color: kSecondaryColor,
-                fontSize: 40,
-                fontFamily: 'SFTHONBURI',
-                fontWeight: FontWeight.w700),
-            headlineMedium: TextStyle(
-                color: kSecondaryColor,
-                fontSize: 20,
-                fontFamily: 'SFTHONBURI',
-                fontWeight: FontWeight.w600),
-            headlineSmall: TextStyle(
-                //text in button must be use
-                color: kSecondaryColor,
-                fontSize: 16,
-                fontFamily: 'SFTHONBURI',
-                fontWeight: FontWeight.w700),
-            bodySmall: TextStyle(
-                color: kSecondaryColor,
-                fontSize: 14,
-                fontFamily: 'SFTHONBURI',
-                fontWeight: FontWeight.w400)),
-        textButtonTheme: TextButtonThemeData(style: flatButtonStyle),
-        elevatedButtonTheme: ElevatedButtonThemeData(style: raisedButtonStyle),
-        outlinedButtonTheme: OutlinedButtonThemeData(style: outlineButtonStyle),
+          bodyMedium: TextStyle(
+            color: Colors.white,
+          ),
+          headlineLarge: TextStyle(
+            color: kSecondaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontWeight: FontWeight.w700,
+          ),
+          headlineMedium: TextStyle(
+            color: kSecondaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontWeight: FontWeight.w600,
+          ),
+          headlineSmall: TextStyle(
+            color: kSecondaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontWeight: FontWeight.w400,
+          ),
+
+          //Fixed font size
+          bodyLarge: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+          bodySmall: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontSize: 13,
+          ),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: const AuthPage(),
