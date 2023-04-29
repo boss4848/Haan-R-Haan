@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:haan_r_haan/constant/constant.dart';
-import 'package:haan_r_haan/src/pages/notification/notification_page.dart';
+import 'package:flutter/cupertino.dart';
 
-import 'widget/partyList.dart';
+import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/widgets/show_more.dart';
+
+import '../../../constant/constant.dart';
+import './widget/custom_appbar.dart';
+import '../../widgets/title.dart';
+import '../../widgets/shadow_container.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,220 +27,197 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              _buildBanner(),
+              const CustomAppBar(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const TitleBar(
+            title: "Party List",
+            subTitle: "as owner - ${1} parties",
+          ),
+          ShadowContainer(
+            element: _buildPartyItem(
+              partyName: "Party name",
+              date: "Tue 18 Apr 22:26",
+              subTitle: "· 6 members",
+              detail: "Total amount 600 baht",
+              price: -500,
+              navigator: () {},
+            ),
+            length: 3,
+          ),
+          const ShowMore(),
+          const TitleBar(
+            title: "Party List",
+            subTitle: "as member - ${1} parties",
+            lastChild: "order by price",
+          ),
+          ShadowContainer(
+            element: _buildPartyItem(
+              partyName: "Party name",
+              date: "Tue 18 Apr 22:26",
+              subTitle: "· username (owner)",
+              detail: "Debt",
+              price: 1300,
+              navigator: () {},
+            ),
+            length: 3,
+          ),
+          const ShowMore(),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
+  Container _buildBanner() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 18),
+      height: 210,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: kDefaultBG,
+      ),
+      child: SafeArea(
         child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "Haan R Haan",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                              "How can I help you today?",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w100),
-                            )
-                          ],
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> const NotificationPage()));
-                            },
-                            icon: const Icon(
-                              Icons.notifications,
-                              size: 35,
-                              color: Colors.white,
-                            ))
-                      ],
+          padding: const EdgeInsets.only(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            top: 10,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset("assets/images/nameBanner4.png", height: 60),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Text(
+                      "Hello, username.",
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                  ),
+                ],
+              ),
+              const Icon(
+                Icons.notifications,
+                size: 36,
+                color: Colors.white,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding _buildPartyItem({
+    required String partyName,
+    required String date,
+    required String subTitle,
+    required String detail,
+    required int price,
+    required Function navigator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    partyName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryColor,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 60,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.horizontal(
-                                        right: Radius.zero,
-                                        left: Radius.circular(10))),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Text(
-                                    "TOTAL DEPT",
-                                    style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    height: 2,
-                                  ),
-                                  Text(
-                                    "1,530 Baht",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: SizedBox(
-                            height: 60,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.horizontal(
-                                        right: Radius.circular(10),
-                                        left: Radius.zero)),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Text(
-                                    "TOTAL LENT",
-                                    style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    height: 2,
-                                  ),
-                                  Text(
-                                    "2,340 Baht",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    // "· 6 members",
+                    subTitle,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: kPrimaryColor,
                     ),
-                  ],
+                  )
+                ],
+              ),
+              const SizedBox(height: 3),
+              Text(
+                date,
+                style: const TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 13,
                 ),
-                const SizedBox(
-                  height: 20,
+              ),
+            ],
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: redPastelColor,
+                    ),
+                    child: Text(
+                      "$price baht",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    detail,
+                    style: const TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => navigator(),
+                child: const Icon(
+                  CupertinoIcons.back,
+                  textDirection: TextDirection.rtl,
+                  color: kPrimaryColor,
+                  size: 20,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Party List",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            color: Colors.white)),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "As Owner",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              IconButton(
-                                  onPressed: () { setState(() {
-                                    showOwner = !showOwner;
-                                  }); },
-                                  icon: Icon(
-                                    showOwner ? Icons.expand_less : Icons.expand_more,
-                                    color: Colors.white,
-                                  )),
-                            ],
-                          ),
-                          showOwner ? const PartyWidget(
-                              name: "Party name1",
-                              people: "8",
-                              date: "Tue 18 Apr 22:26",
-                              money: "200") : const SizedBox(height: 0,)
-                        ]),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "As Member",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              IconButton(
-                                  onPressed: () {setState(() {
-                                    showMember = !showMember;
-                                  });},
-                                  icon: Icon(
-                                    showMember ? Icons.expand_less : Icons.expand_more,
-                                    color: Colors.white,
-                                  )),
-                            ],
-                          ),
-                          showMember ?
-                          Wrap(
-                            runSpacing: 20,
-                              children: const [
-                                PartyWidget(
-                                    name: "Party name1",
-                                    people: "8",
-                                    date: "Tue 18 Apr 22:26",
-                                    money: "200"),
-                                PartyWidget(
-                                    name: "Party name1",
-                                    people: "8",
-                                    date: "Tue 18 Apr 22:26",
-                                    money: "200"),
-                              ],
-                            ) : const SizedBox()
-                        ]),
-                        const SizedBox(height: 20,),
-                        ElevatedButton(onPressed: signOut, child: const Text("Sign out")),
-                  ],
-                )
-              ],
-            )),
-      );;
+              )
+            ],
+          )
+        ],
+      ),
+    );
   }
 }
