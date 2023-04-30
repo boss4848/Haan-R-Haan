@@ -77,6 +77,12 @@ class MainApp extends StatelessWidget {
             fontSize: 25,
             fontWeight: FontWeight.bold,
           ),
+          labelMedium: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
           bodySmall: TextStyle(
             color: kPrimaryColor,
             fontFamily: 'SFTHONBURI',

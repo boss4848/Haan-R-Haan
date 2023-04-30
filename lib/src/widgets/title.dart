@@ -8,6 +8,7 @@ class TitleBar extends StatelessWidget {
   final String subTitle;
   final bool isNoSpacer;
   final String? lastChild;
+  final bool? isNoPadding;
   const TitleBar({
     required this.title,
     this.count,
@@ -15,14 +16,15 @@ class TitleBar extends StatelessWidget {
     this.isNoSpacer = false,
     super.key,
     this.lastChild,
+    this.isNoPadding = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: 20,
-        right: 20,
+      padding: EdgeInsets.only(
+        left: isNoPadding! ? 0 : 20,
+        right: isNoPadding! ? 0 : 20,
         top: 20,
         bottom: 10,
       ),
