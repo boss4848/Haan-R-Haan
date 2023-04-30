@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget {
           Container(
             height: appBarSize,
             width: appBarSize,
-            decoration: boxShadow,
+            decoration: boxShadow_1,
             child: const Center(
               child: Icon(Icons.search, size: 30),
             ),
@@ -28,7 +28,7 @@ class CustomAppBar extends StatelessWidget {
             child: Container(
               height: 65,
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: boxShadow,
+              decoration: boxShadow_1,
               child: Center(
                 child: TextField(
                   decoration: const InputDecoration(

@@ -105,7 +105,14 @@ class BottomNavBar extends StatelessWidget {
           Center(
             heightFactor: 0.6,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CreatePartyPage(),
+                  ),
+                );
+              },
               child: Container(
                 height: 80,
                 width: 80,
