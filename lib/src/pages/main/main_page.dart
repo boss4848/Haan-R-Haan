@@ -12,6 +12,8 @@ import '../profile/profile_page.dart';
 import '../scan/scan_page.dart';
 
 Map userData = {};
+// String username = "";
+List<String> greetingPhrases = [];
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -21,6 +23,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MainPage> {
+  //get user data
   getUserData() async {
     await FirebaseFirestore.instance.collection("users").get().then((value) {
       value.docs.forEach((element) {
@@ -28,6 +31,17 @@ class _MyWidgetState extends State<MainPage> {
             FirebaseAuth.instance.currentUser!.email) {
           setState(() {
             userData = element.data();
+            greetingPhrases = [
+              "Grab a bite, ${userData["username"]}?",
+              "Chow down, ${userData["username"]}?",
+              "Join me, ${userData["username"]}?",
+              "Share a table, ${userData["username"]}?",
+              "Let's break bread, ${userData["username"]}?",
+              "Dine with me, ${userData["username"]}?",
+              "Food's better shared, ${userData["username"]}.",
+              "Feast together, my treat, ${userData["username"]}?",
+              "Good food and company, ${userData["username"]}?",
+            ];
           });
           print(element.data());
         }
@@ -35,9 +49,21 @@ class _MyWidgetState extends State<MainPage> {
     });
   }
 
+  fetchUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .get();
+
+    return userData;
+  }
+
   @override
   void initState() {
     getUserData();
+    // username = userData["username"];
+
     super.initState();
   }
 
