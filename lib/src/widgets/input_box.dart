@@ -9,12 +9,16 @@ class InputBox extends StatelessWidget {
   final String errorText;
   final bool obscureText;
   final bool? isMini;
+  final bool isShadow;
+  final bool isLight;
   const InputBox({
     super.key,
     this.obscureText = false,
     this.label = "",
     this.showLabel = true,
     this.isMini = false,
+    this.isShadow = true,
+    this.isLight = false,
     required this.controller,
     required this.errorText,
   });
@@ -27,11 +31,16 @@ class InputBox extends StatelessWidget {
         if (showLabel)
           Text(
             label,
-            style: Theme.of(context).textTheme.labelMedium,
+            style: isLight
+                ? Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: greyBackgroundColor,
+                      fontSize: 16,
+                    )
+                : Theme.of(context).textTheme.labelMedium,
           ),
         const SizedBox(height: 10),
         Container(
-          decoration: boxShadow_2,
+          decoration: isShadow ? null : boxShadow_1,
           child: TextFormField(
             controller: controller,
             obscureText: obscureText,
@@ -40,19 +49,19 @@ class InputBox extends StatelessWidget {
                 horizontal: isMini! ? 25 : 15,
                 vertical: isMini! ? 20 : 10,
               ),
-              enabledBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
                 borderSide: BorderSide(
-                  color: Colors.white,
+                  color: isLight ? greyBackgroundColor : Colors.white,
                 ),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
                 borderSide: BorderSide(
-                  color: Colors.white,
+                  color: isLight ? greyBackgroundColor : Colors.white,
                 ),
               ),
-              fillColor: Colors.white,
+              fillColor: isLight ? greyBackgroundColor : Colors.white,
               filled: true,
             ),
           ),
