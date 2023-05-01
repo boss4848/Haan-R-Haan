@@ -46,6 +46,41 @@ List<Party> parties = [
       {"name": "Boss", "bill": 113.3},
       {"name": "Yo", "bill": 113.3},
       {"name": "Dol", "bill": 53.3},
+      {"name": "Fahsai", "bill": 113.3},
+      {"name": "Gift", "bill": 113.3},
+      {"name": "Oil", "bill": 53.3},
+      {"name": "Mark", "bill": 113.3},
+      {"name": "Yo's friend", "bill": 113.3},
+      {"name": "Mark's FWB", "bill": 53.3},
+      {"name": "Fam", "bill": 113.3},
+      {"name": "Tos", "bill": 113.3},
+      {"name": "Boss2", "bill": 53.3},
     ],
-  )
+  ),
+  Party(
+      id: 2,
+      dateAndTime: DateTime.now(),
+      partyName: "จ่ายด้วยน้อง",
+      owner: "Yo",
+      ownerPhone: '0956786848',
+      foodName: [
+        "VodKa Bucket",
+        "มะนาวดอง",
+        "vat",
+      ],
+      foodPrice: [
+        1700,
+        50,
+        123
+      ],
+      member: [
+        "Boss",
+        "Yo",
+        "Dol"
+      ],
+      allMember: [
+        {"name": "Boss", "bill": 113.3},
+        {"name": "Yo", "bill": 113.3},
+        {"name": "Dol", "bill": 53.3},
+      ])
 ];

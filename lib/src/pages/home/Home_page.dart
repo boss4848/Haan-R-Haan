@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/widgets/show_more.dart';
+import '../bill_detail/owner_bill_detail/bill_owner_page.dart';
 
 import '../../../constant/constant.dart';
 import './widget/custom_appbar.dart';
@@ -48,7 +49,13 @@ class _HomePageState extends State<HomePage> {
               subTitle: "· 6 members",
               detail: "Total amount 600 baht",
               price: -500,
-              navigator: () {},
+              navigator: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OwnerBillDetailPage(),
+                    ));
+              },
             ),
             length: 3,
           ),

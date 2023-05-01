@@ -13,6 +13,7 @@ dependencies:
   firebase_core: ^2.10.0
   flutter:
     sdk: flutter
+  flutter_svg: ^2.0.5
   intl: ^0.17.0
   promptpay_qrcode_generate: ^1.0.1
   qr_flutter: ^4.0.0
@@ -26,6 +27,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/icons/
   fonts:
   - family: Kanit
     fonts:

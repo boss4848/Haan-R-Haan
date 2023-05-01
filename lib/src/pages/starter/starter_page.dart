@@ -10,7 +10,10 @@ class StartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kPrimaryColor,
-      body: SBody(),
+      body: Container(
+        child: SBody(),
+        decoration: const BoxDecoration(gradient: kDefaultBG),
+      ),
     );
   }
 }

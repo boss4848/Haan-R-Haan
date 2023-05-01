@@ -51,9 +51,6 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(
-            color: Colors.white,
-          ),
           headlineLarge: TextStyle(
             color: kSecondaryColor,
             fontFamily: 'SFTHONBURI',
@@ -76,6 +73,11 @@ class MainApp extends StatelessWidget {
             fontFamily: 'SFTHONBURI',
             fontSize: 25,
             fontWeight: FontWeight.bold,
+          ),
+          bodyMedium: TextStyle(
+            color: kPrimaryColor,
+            fontFamily: 'SFTHONBURI',
+            fontSize: 19,
           ),
           bodySmall: TextStyle(
             color: kPrimaryColor,

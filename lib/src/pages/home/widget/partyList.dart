@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../bill_detail/bill_page.dart';
+import '../../bill_detail/owner_bill_detail/bill_owner_page.dart';
 
 class PartyWidget extends StatelessWidget {
   final String name;
@@ -22,7 +22,10 @@ class PartyWidget extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> const BillDetailPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const OwnerBillDetailPage()));
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -62,7 +65,9 @@ class PartyWidget extends StatelessWidget {
                               ))
                         ],
                       ),
-                      const SizedBox(height: 5,),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       Text(date,
                           style: const TextStyle(
                             color: Colors.black,
