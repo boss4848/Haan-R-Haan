@@ -25,7 +25,7 @@ class ShadowContainer extends StatelessWidget {
         top: 20,
         bottom: 10,
       ),
-      decoration: boxShadow,
+      decoration: boxShadow_1,
       child: Column(
         children: [
           // loop through the list of widgets

@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget {
           Container(
             height: appBarSize,
             width: appBarSize,
-            decoration: boxShadow,
+            decoration: boxShadow_1,
             child: const Center(
               child: Icon(CupertinoIcons.qrcode_viewfinder, size: 40),
             ),
@@ -28,7 +28,7 @@ class CustomAppBar extends StatelessWidget {
             child: Container(
               height: appBarSize,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: boxShadow,
+              decoration: boxShadow_1,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [

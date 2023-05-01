@@ -1,7 +1,11 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/pages/main/main_page.dart';
 import 'package:haan_r_haan/src/widgets/show_more.dart';
 import '../bill_detail/owner_bill_detail/bill_owner_page.dart';
 
@@ -18,11 +22,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool showOwner = true;
-  bool showMember = true;
+  String addNewLineAfterSixWords(String phrase) {
+    final List<String> words = phrase.split(' ');
+    final int numWords = words.length;
 
-  signOut() async {
-    await FirebaseAuth.instance.signOut();
+    if (numWords <= 6) {
+      return phrase; // return the original phrase if it has 6 or fewer words
+    }
+
+    String newPhrase = ''; // initialize the new phrase string
+
+    for (int i = 0; i < numWords; i += 6) {
+      final int end = (i + 6 < numWords) ? i + 6 : numWords;
+      final String line =
+          words.sublist(i, end).join(' '); // get 6 words at a time
+      newPhrase +=
+          '$line\n'; // add the line to the new phrase with a newline character
+    }
+
+    return newPhrase.trim(); // remove any trailing whitespace
   }
 
   @override
@@ -107,13 +125,14 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Image.asset("assets/images/nameBanner4.png", height: 60),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
                     child: Text(
-                      "Hello, username.",
-                      style: TextStyle(
+                      greetingPhrases[Random().nextInt(greetingPhrases.length)],
+                      style: const TextStyle(
                         fontSize: 16,
                       ),
+                      maxLines: 2,
                     ),
                   ),
                 ],

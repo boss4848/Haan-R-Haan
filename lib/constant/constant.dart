@@ -31,12 +31,26 @@ const kDefaultShadow = BoxShadow(
 const Description =
     'Split expenses with ease! Our app simplifies cost calculation for shared items among friends.';
 
-final boxShadow = BoxDecoration(
+const greyBackgroundColor = Color(0xFFE9E9E9);
+const greenPastelColor = Color(0xFFA7D2A1);
+const errorColor = Color(0xFFE11831);
+final boxShadow_1 = BoxDecoration(
   borderRadius: BorderRadius.circular(13),
   color: Colors.white,
   boxShadow: [
     BoxShadow(
       color: Colors.black.withOpacity(0.2),
+      blurRadius: 20,
+      offset: const Offset(0, 5),
+    ),
+  ],
+);
+final boxShadow_2 = BoxDecoration(
+  borderRadius: BorderRadius.circular(13),
+  color: Colors.white,
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.1),
       blurRadius: 20,
       offset: const Offset(0, 5),
     ),
