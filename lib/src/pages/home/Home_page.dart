@@ -10,6 +10,7 @@ import 'package:haan_r_haan/src/widgets/show_more.dart';
 import '../bill_detail/owner_bill_detail/bill_owner_page.dart';
 
 import '../../../constant/constant.dart';
+import '../notification/notification_page.dart';
 import './widget/custom_appbar.dart';
 import '../../widgets/title.dart';
 import '../../widgets/shadow_container.dart';
@@ -163,11 +164,15 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              const Icon(
+              IconButton(onPressed: (){Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationPage(),
+                    ));}, icon: const Icon(
                 Icons.notifications,
                 size: 36,
                 color: Colors.white,
-              )
+              ),)
             ],
           ),
         ),
