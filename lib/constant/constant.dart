@@ -8,6 +8,7 @@ const kMemberCardColor = Color(0xFFF47C7C);
 const blueBackgroundColor = Color(0xFFACB8CE);
 const redPastelColor = Color(0xffF47C7C);
 const greenPastelColor = Color(0xffA7D2A1);
+const greyTextColor = Color(0xFF9898A8);
 const kDefaultPadding = 20.0;
 
 const kDefaultBG = LinearGradient(
@@ -32,7 +33,6 @@ const Description =
     'Split expenses with ease! Our app simplifies cost calculation for shared items among friends.';
 
 const greyBackgroundColor = Color(0xFFE9E9E9);
-const greenPastelColor = Color(0xFFA7D2A1);
 const errorColor = Color(0xFFE11831);
 final boxShadow_1 = BoxDecoration(
   borderRadius: BorderRadius.circular(13),

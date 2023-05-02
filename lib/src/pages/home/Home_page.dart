@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/pages/main/main_page.dart';
 import 'package:haan_r_haan/src/widgets/show_more.dart';
+import '../bill_detail/member_bill_detail/bill_member_page.dart';
 import '../bill_detail/owner_bill_detail/bill_owner_page.dart';
 
 import '../../../constant/constant.dart';
@@ -91,7 +92,13 @@ class _HomePageState extends State<HomePage> {
               subTitle: "· username (owner)",
               detail: "Debt",
               price: 1300,
-              navigator: () {},
+              navigator: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MemberBillDetail(),
+                    ));
+              },
             ),
             length: 3,
           ),
@@ -164,15 +171,20 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              IconButton(onPressed: (){Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NotificationPage(),
-                    ));}, icon: const Icon(
-                Icons.notifications,
-                size: 36,
-                color: Colors.white,
-              ),)
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationPage(),
+                      ));
+                },
+                icon: const Icon(
+                  Icons.notifications,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              )
             ],
           ),
         ),

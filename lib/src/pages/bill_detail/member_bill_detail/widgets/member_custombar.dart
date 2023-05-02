@@ -7,8 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../models/billDetail_models.dart';
 
 // ignore: camel_case_types
-class billDetailBar extends StatelessWidget {
-  const billDetailBar({super.key});
+class MemberbillDetailBar extends StatelessWidget {
+  const MemberbillDetailBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,17 +47,6 @@ class billDetailBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    RemainingUnpaid(
-                      party: parties[0],
-                    ),
-                    Container(
-                      width: 1,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
                     TotalAmount(party: parties[0]),
                     Container(
                       width: 1,
@@ -77,54 +66,6 @@ class billDetailBar extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class RemainingUnpaid extends StatefulWidget {
-  final Party party;
-  const RemainingUnpaid({super.key, required this.party});
-
-  @override
-  State<RemainingUnpaid> createState() => _RemainingUnpaidState();
-}
-
-class _RemainingUnpaidState extends State<RemainingUnpaid> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              widget.party.allMember.length.toString(),
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(color: kPrimaryColor, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              width: kDefaultPadding / 4,
-            ),
-            Text('Members',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: kPrimaryColor))
-          ],
-        ),
-        Text(
-          'UNPAID',
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: Colors.grey),
-        )
-      ],
     );
   }
 }
@@ -203,7 +144,7 @@ class _TotalLentState extends State<TotalLent> {
               width: kDefaultPadding / 10,
             ),
             Text(
-              '-${widget.party.totalPrice.toStringAsFixed(0)}฿',
+              '${widget.party.totalPrice.toStringAsFixed(0)}฿',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   color: redPastelColor,
                   fontWeight: FontWeight.bold,
@@ -212,7 +153,7 @@ class _TotalLentState extends State<TotalLent> {
           ],
         ),
         Text(
-          'TOTAL LENT',
+          'YOU NEED TO PAY',
           style: Theme.of(context)
               .textTheme
               .bodySmall

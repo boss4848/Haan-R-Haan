@@ -12,6 +12,9 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
   String _username = "Yovatcha";
   String _email = "yo@gmail.com";
   String _phoneNo = "0956786848";
+  // String _username = userData[userName];
+  // String _email = "yo@gmail.com";
+  // String _phoneNo = "0956786848";
 
   void _editUserInfo() async {
     // Show a dialog to edit user info
@@ -24,29 +27,45 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
         final phoneNoController = TextEditingController(text: _phoneNo);
 
         return AlertDialog(
-          title: const Text("Edit User Info"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: "Username",
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          title: Text(
+            "Edit User Info",
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(color: kPrimaryColor),
+          ),
+          content: Padding(
+            padding: const EdgeInsets.all(kDefaultPadding / 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(
+                      labelText: "Username",
+                      prefixIcon: Icon(
+                        Icons.person_2_rounded,
+                        color: kPrimaryColor,
+                      ),
+                      hintText: 'Your Username',
+                      fillColor: kPrimaryColor),
                 ),
-              ),
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: "Email",
+                TextField(
+                  controller: phoneNoController,
+                  decoration: const InputDecoration(
+                      labelText: "Phone Number",
+                      prefixIcon: Icon(
+                        Icons.phone_android_rounded,
+                        color: kPrimaryColor,
+                      ),
+                      hintText: 'Your Phone No.',
+                      fillColor: kPrimaryColor),
                 ),
-              ),
-              TextField(
-                controller: phoneNoController,
-                decoration: const InputDecoration(
-                  labelText: "Phone Number",
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -86,42 +105,105 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
-        children: [
-          const SizedBox(height: kDefaultPadding / 4),
-          Container(
-            margin: const EdgeInsets.only(left: kDefaultPadding),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              _username,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(color: kPrimaryColor),
+      decoration: const BoxDecoration(
+        color: kSecondaryColor,
+        boxShadow: [kDefaultShadow],
+        //borderRadius: BorderRadius.all(Radius.circular(15))
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(kDefaultPadding / 2),
+        child: Column(
+          children: [
+            const SizedBox(height: kDefaultPadding / 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: kDefaultPadding),
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _username,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(color: kPrimaryColor),
+                  ),
+                ),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: greyTextColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    side: const BorderSide(color: greyTextColor),
+                  ),
+                  onPressed: _editUserInfo,
+                  child: const Icon(
+                    Icons.edit,
+                    color: greyTextColor,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: kDefaultPadding),
-          Row(
-            children: [
-              Container(child: const Icon(Icons.email)),
-              const SizedBox(width: 8),
-              Text(_email),
-            ],
-          ),
-          const SizedBox(height: kDefaultPadding),
-          Row(
-            children: [
-              const Icon(Icons.phone),
-              const SizedBox(width: 8),
-              Text(_phoneNo),
-            ],
-          ),
-          const SizedBox(height: kDefaultPadding),
-          ElevatedButton(
-            onPressed: _editUserInfo,
-            child: const Text("Edit"),
-          ),
-        ],
+            const SizedBox(height: kDefaultPadding),
+            Row(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                          color:
+                              greyTextColor, // Replace with your desired background color
+                          shape: BoxShape.circle),
+                      child: const Icon(
+                        Icons.email,
+                        color: kSecondaryColor,
+                      )),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _email,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: greyTextColor),
+                ),
+              ],
+            ),
+            const SizedBox(height: kDefaultPadding),
+            Row(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                          color:
+                              greyTextColor, // Replace with your desired background color
+                          shape: BoxShape.circle),
+                      child: const Icon(
+                        Icons.phone_android,
+                        color: kSecondaryColor,
+                      )),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _phoneNo,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: greyTextColor),
+                ),
+              ],
+            ),
+            const SizedBox(height: kDefaultPadding),
+          ],
+        ),
       ),
     );
   }

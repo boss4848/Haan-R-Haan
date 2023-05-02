@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/member_bill_detail/widgets/promptpay_member.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/MemberAndBill.dart';
 import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/promptPay.dart';
 
 import '../../../../../../constant/constant.dart';
 import '../../../../models/billDetail_models.dart';
-import 'MemberAndBill.dart';
-import 'foodListCard.dart';
+import '../../owner_bill_detail/widgets/foodListCard.dart';
 
-class FoodList extends StatefulWidget {
+class foodlistForMember extends StatefulWidget {
   final Party party;
-  const FoodList({
-    Key? key,
-    required this.party,
-  }) : super(key: key);
+  const foodlistForMember({super.key, required this.party});
 
   @override
-  _FoodListState createState() => _FoodListState();
+  State<foodlistForMember> createState() => _foodlistForMemberState();
 }
 
-class _FoodListState extends State<FoodList> {
+class _foodlistForMemberState extends State<foodlistForMember> {
   bool showAll = false;
 
   @override
@@ -115,7 +113,7 @@ class _FoodListState extends State<FoodList> {
           const SizedBox(
             height: kDefaultPadding,
           ),
-          const PromptpatPayment()
+          const PromptpayPaymentForMember()
         ],
       ),
     );

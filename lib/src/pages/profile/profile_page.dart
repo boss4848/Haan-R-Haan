@@ -10,7 +10,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: blueBackgroundColor,
-      body: profileBody(),
+      body: SingleChildScrollView(child: profileBody()),
     );
   }
 }

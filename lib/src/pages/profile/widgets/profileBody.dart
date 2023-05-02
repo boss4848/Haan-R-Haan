@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
+import 'package:haan_r_haan/src/pages/profile/widgets/paid_party.dart';
 import 'package:haan_r_haan/src/pages/profile/widgets/user_info.dart';
 
 // ignore: camel_case_types
@@ -38,11 +39,47 @@ class profileBody extends StatelessWidget {
             )
           ]),
         ),
-        const SizedBox(
-          height: kDefaultPadding,
-        ),
         UserInfoWidget(),
-        ElevatedButton(onPressed: signOut, child: const Text("Sign out"))
+        PaidPartyWidget(),
+        Padding(
+          padding: const EdgeInsets.all(kDefaultPadding),
+          child: Column(
+            children: [
+              Container(
+                  alignment: Alignment.center,
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: kPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        side: BorderSide(color: kPrimaryColor),
+                      ),
+                      onPressed: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: kDefaultPadding / 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text('Change Password'),
+                          ],
+                        ),
+                      ))),
+              Container(
+                width: double.maxFinite,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: signOut,
+                    child: const Text("Sign out")),
+              )
+            ],
+          ),
+        ),
       ],
     );
   }
