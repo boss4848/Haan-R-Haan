@@ -27,7 +27,7 @@ class NotiFriend extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "$name added your friend",
+                "$name has been added your friend!",
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.bold),
               ),

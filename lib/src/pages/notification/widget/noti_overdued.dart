@@ -32,7 +32,7 @@ class NotiOverdued extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Amount overdue",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),),
+                  const Text("Amount overdued!",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),),
                   const SizedBox(height: 5,),
                   Text("$money Baht - $partyName",style: const TextStyle(color: Colors.black),),
                 ],

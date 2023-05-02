@@ -3,12 +3,13 @@ import 'package:flutter/src/widgets/placeholder.dart';
 
 import 'package:flutter/material.dart';
 
-class NotiGroup extends StatelessWidget {
-  final String name;
+class NotiBillPaid extends StatelessWidget {
   final String partyName;
   final String time;
+  final String name;
+  final String money;
 
-  const NotiGroup({super.key, required this.name, required this.time, required this.partyName});
+  const NotiBillPaid({super.key, required this.partyName, required this.money, required this.time, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +33,10 @@ class NotiGroup extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("$name joined your party",style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
-                  const SizedBox(height: 4,),
-                  Text(partyName, style: const TextStyle(color: Colors.black),)
+                  const Text("Your bill has been paid",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),),
+                  const SizedBox(height: 5,),
+                  Text("$name has checked your $money baht bill",style: const TextStyle(color: Colors.black),),
+                  Text("- $partyName",style: const TextStyle(color: Colors.black))
                 ],
               ),
               Text(time, style: const TextStyle(color: Colors.black),)
