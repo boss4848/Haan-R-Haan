@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/bill_detail/components/MemberAndBill.dart';
-import 'package:haan_r_haan/src/pages/bill_detail/components/partyName.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/partyName.dart';
 
-import '../../../../constant/constant.dart';
-import '../../../models/billDetail_models.dart';
+import '../../../../models/billDetail_models.dart';
 import 'foodList.dart';
 
 class Bbody extends StatefulWidget {
@@ -17,7 +15,6 @@ class _BbodyState extends State<Bbody> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(gradient: kDefaultBG),
       child: Column(
         children: [
           PartyBar(party: parties[0]),

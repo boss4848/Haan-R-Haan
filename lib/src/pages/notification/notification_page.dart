@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:haan_r_haan/constant/constant.dart';
-import 'package:haan_r_haan/src/pages/bill_detail/components/arrowBack.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/arrowBack.dart';
 import 'package:haan_r_haan/src/pages/notification/widget/noti_addfriend.dart';
 import 'package:haan_r_haan/src/pages/notification/widget/noti_group.dart';
 import 'package:haan_r_haan/src/pages/notification/widget/noti_overdued.dart';
