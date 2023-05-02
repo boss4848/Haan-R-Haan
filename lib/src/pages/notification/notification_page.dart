@@ -87,7 +87,7 @@ class NotificationPage extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               const Text(
-                "Create Party",
+                "Notifications",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 32,
