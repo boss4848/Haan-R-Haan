@@ -13,7 +13,7 @@ import '../scan/scan_page.dart';
 
 Map userData = {};
 // String username = "";
-List<String> greetingPhrases = [];
+// List<String> greetingPhrases = [];
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -31,17 +31,17 @@ class _MyWidgetState extends State<MainPage> {
             FirebaseAuth.instance.currentUser!.email) {
           setState(() {
             userData = element.data();
-            greetingPhrases = [
-              "Grab a bite, ${userData["username"]}?",
-              "Chow down, ${userData["username"]}?",
-              "Join me, ${userData["username"]}?",
-              "Share a table, ${userData["username"]}?",
-              "Let's break bread, ${userData["username"]}?",
-              "Dine with me, ${userData["username"]}?",
-              "Food's better shared, ${userData["username"]}.",
-              "Feast together, my treat, ${userData["username"]}?",
-              "Good food and company, ${userData["username"]}?",
-            ];
+            // List<String> greetingPhrases = [
+            //   "Grab a bite, ${userData["username"]}?",
+            //   "Chow down, ${userData["username"]}?",
+            //   "Join me, ${userData["username"]}?",
+            //   "Share a table, ${userData["username"]}?",
+            //   "Let's break bread, ${userData["username"]}?",
+            //   "Dine with me, ${userData["username"]}?",
+            //   "Food's better shared, ${userData["username"]}.",
+            //   "Feast together, my treat, ${userData["username"]}?",
+            //   "Good food and company, ${userData["username"]}?",
+            // ];
           });
           print(element.data());
         }
