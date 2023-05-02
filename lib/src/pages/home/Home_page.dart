@@ -120,13 +120,39 @@ class _HomePageState extends State<HomePage> {
                   Image.asset("assets/images/nameBanner4.png", height: 60),
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
-                    child: Text(
-                      greetingPhrases[Random().nextInt(greetingPhrases.length)],
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                      maxLines: 2,
-                    ),
+                    child: FutureBuilder(
+                        //get username from firestore
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .where('email',
+                                isEqualTo:
+                                    FirebaseAuth.instance.currentUser!.email)
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Text("Loading...");
+                          }
+                          final greetingPhrases = [
+                            "Grab a bite, ${userData["username"]}?",
+                            "Chow down, ${userData["username"]}?",
+                            "Join me, ${userData["username"]}?",
+                            "Share a table, ${userData["username"]}?",
+                            "Let's break bread, ${userData["username"]}?",
+                            "Dine with me, ${userData["username"]}?",
+                            "Food's better shared, ${userData["username"]}.",
+                            "Feast together, my treat, ${userData["username"]}?",
+                            "Good food and company, ${userData["username"]}?",
+                          ];
+                          return Text(
+                            greetingPhrases[
+                                Random().nextInt(greetingPhrases.length)],
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                            maxLines: 2,
+                          );
+                        }),
                   ),
                 ],
               ),
