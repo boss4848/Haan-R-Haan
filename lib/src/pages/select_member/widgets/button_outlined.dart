@@ -23,7 +23,6 @@ class ButtonOutlined extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
         ),
         side: const BorderSide(color: kPrimaryColor),
-        shadowColor: Colors.transparent,
       ),
       onPressed: () => onPressed,
       child: Row(

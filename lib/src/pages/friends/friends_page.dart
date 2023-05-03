@@ -100,9 +100,9 @@ class _FriendsPageState extends State<FriendsPage> {
                   Text(
                     "Friends",
                     style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: kSecondaryColor),
                   ),
                   Icon(
                     Icons.notifications,

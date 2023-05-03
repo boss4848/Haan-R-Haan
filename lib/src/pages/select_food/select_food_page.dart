@@ -102,9 +102,8 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                         children: [
                           const Text(
                             "Owner name",
-                            style: TextStyle(
-                              fontSize: 19,
-                            ),
+                            style:
+                                TextStyle(fontSize: 19, color: kSecondaryColor),
                           ),
                           const SizedBox(width: 7),
                           Text(
@@ -322,7 +321,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 19,
+          horizontal: 16,
           vertical: 10,
         ),
         child: Column(

@@ -163,8 +163,7 @@ class _HomePageState extends State<HomePage> {
                             greetingPhrases[
                                 Random().nextInt(greetingPhrases.length)],
                             style: const TextStyle(
-                              fontSize: 16,
-                            ),
+                                fontSize: 16, color: kSecondaryColor),
                             maxLines: 2,
                           );
                         }),
