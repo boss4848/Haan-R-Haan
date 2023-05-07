@@ -34,7 +34,7 @@ class NotiDebt extends StatelessWidget {
                 children: [
                   const Text("Your debt today...",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),),
                   const SizedBox(height: 5,),
-                  Text("$money Baht - From $partyNumber parties",style: const TextStyle(color: Colors.black),),
+                  Flexible(child: Text("$money Baht - From $partyNumber parties",style: const TextStyle(color: Colors.black),)),
                 ],
               ),
               Text(time, style: const TextStyle(color: Colors.black),)

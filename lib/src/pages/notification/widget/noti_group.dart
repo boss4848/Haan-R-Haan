@@ -32,9 +32,9 @@ class NotiGroup extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("$name joined your party",style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
+                  Flexible(child: Text("$name joined your party",style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),)),
                   const SizedBox(height: 4,),
-                  Text(partyName, style: const TextStyle(color: Colors.black),)
+                  Flexible(child: Text(partyName, style: const TextStyle(color: Colors.black),))
                 ],
               ),
               Text(time, style: const TextStyle(color: Colors.black),)

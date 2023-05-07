@@ -26,10 +26,12 @@ class NotiFriend extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "$name has been added your friend!",
-                style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold),
+              Flexible(
+                child: Text(
+                  "$name has been added your friend!",
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
               ),
               Text(
                 time,

@@ -33,10 +33,10 @@ class NotiBillPaid extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Your bill has been paid",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),),
+                  const Flexible(child: Text("Your bill has been paid",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),)),
                   const SizedBox(height: 5,),
-                  Text("$name has checked your $money baht bill",style: const TextStyle(color: Colors.black),),
-                  Text("- $partyName",style: const TextStyle(color: Colors.black))
+                  Flexible(child: Text("$name has checked your $money baht bill",style: const TextStyle(color: Colors.black),)),
+                  Flexible(child: Text("- $partyName",style: const TextStyle(color: Colors.black)))
                 ],
               ),
               Text(time, style: const TextStyle(color: Colors.black),)
