@@ -1,38 +1,103 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class ScanPage extends StatelessWidget {
+class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        title: Row(children: const [
-          Text(
-            "QR Code Scaner",
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 30),
-          )
-        ]),
-        backgroundColor: const Color.fromRGBO(35, 34, 72, 1.0),
-        toolbarHeight: 80,
-      ),
-      body: Container(
-        color: Colors.blue,
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          height: 50.0,
-          color: const Color.fromRGBO(35, 34, 72, 1.0),
+  State<ScanPage> createState() => _ScanPageState();
+}
+
+class _ScanPageState extends State<ScanPage> {
+  final qrKey = GlobalKey(debugLabel: 'QR');
+  Barcode? barcode;
+  QRViewController? controller;
+
+  @override
+  void reassemble() async {
+    super.reassemble();
+
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
+  }
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+          child: Scaffold(
+        body: Stack(
           alignment: Alignment.center,
-          child: const Text(
-            "Place the QR code in the scan poisition",
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
+          children: <Widget>[
+            buildQrView(context),
+            Positioned(
+              bottom: 25,
+              child: buildResult(),
+            ),
+            Positioned(
+              bottom: 25,
+              left: 10,
+              child: buildControlButtons(),
+            )
+          ],
         ),
-      ),
-    ));
+      ));
+
+  Widget buildControlButtons() => Row(
+        children: <Widget>[
+          IconButton(
+            icon: FutureBuilder<bool?>(
+              future: controller?.getFlashStatus(),
+              builder: (context, snapshot) {
+                if (snapshot.data != null) {
+                  return Icon(
+                      snapshot.data! ? Icons.flash_on : Icons.flash_off);
+                } else {
+                  return Container();
+                }
+              },
+            ),
+            onPressed: () async {
+              await controller?.toggleFlash();
+              setState(() {});
+            },
+          ),
+        ],
+      );
+
+  Widget buildResult() => Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white24,
+        ),
+        child: Text(
+          barcode != null ? 'Result : ${barcode!.code}' : 'Scan a QR!',
+          maxLines: 3,
+        ),
+      );
+
+  Widget buildQrView(BuildContext context) => QRView(
+        key: qrKey,
+        onQRViewCreated: onQRViewCreated,
+        overlay: QrScannerOverlayShape(
+          borderColor: Theme.of(context).accentColor,
+          borderRadius: 10,
+          borderLength: 20,
+          borderWidth: 10,
+          cutOutSize: MediaQuery.of(context).size.width * 0.8,
+        ),
+      );
+
+  void onQRViewCreated(QRViewController controller) {
+    setState(() {
+      this.controller = controller;
+    });
+
+    controller.scannedDataStream
+        .listen((barcode) => setState(() => this.barcode = barcode));
   }
 }
