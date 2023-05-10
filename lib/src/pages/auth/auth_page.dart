@@ -1,25 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/login/login_page.dart';
-import 'package:haan_r_haan/src/pages/starter/starter_page.dart';
-
+import 'package:provider/provider.dart';
+import '../../viewmodels/auth_view_model.dart';
 import '../main/main_page.dart';
+import '../starter/starter_page.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({super.key});
+  const AuthPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
+    return Consumer<AuthViewModel>(
+      builder: (context, authViewModel, _) {
         // Logged in
-        if (snapshot.hasData) {
+        if (authViewModel.currentUser != null) {
           return const MainPage();
         }
         // Logged out
         else {
-          // return const LoginPage();
           return const StartPage();
         }
       },
