@@ -21,13 +21,10 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
   // String _email = "yo@gmail.com";
   // String _phoneNo = "0956786848";
   String _username = userData["username"];
-  String _email = userData["email"];
+  final String _email = userData["email"];
   String _phoneNo = userData["phoneNumber"];
 
   void _editUserInfo() async {
-    String usernameError = '';
-    String phoneNoError = '';
-
     final updatedUserInfo = await showModalBottomSheet<Map<String, String>>(
       backgroundColor: Colors.transparent,
       context: context,
@@ -180,9 +177,8 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
 
     if (updatedUserInfo != null) {
       setState(() {
-        _username = updatedUserInfo["username"] ?? "username";
-        _email = updatedUserInfo["email"] ?? "email";
-        _phoneNo = updatedUserInfo["phoneNo"] ?? "phone";
+        _username = updatedUserInfo["username"] ?? "invalid username";
+        _phoneNo = updatedUserInfo["phoneNo"] ?? "invalid phone no.";
       });
     }
   }
