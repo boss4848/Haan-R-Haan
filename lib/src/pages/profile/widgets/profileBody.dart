@@ -18,29 +18,29 @@ class profileBody extends StatelessWidget {
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: Stack(children: [
-            const SizedBox(
+          child: Stack(children: const [
+            SizedBox(
                 width: double.infinity,
                 child: Image(
                   image: AssetImage('assets/images/Banner.gif'),
                   fit: BoxFit.cover,
                 )),
-            Container(
-              margin: const EdgeInsets.only(left: 33, top: 65),
-              width: 130,
-              height: 130,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage('assets/images/profile.jpg'),
-                ),
-              ),
-            )
+            // Container(
+            //   margin: const EdgeInsets.only(left: 33, top: 65),
+            //   width: 130,
+            //   height: 130,
+            //   decoration: const BoxDecoration(
+            //     shape: BoxShape.circle,
+            //     image: DecorationImage(
+            //       fit: BoxFit.cover,
+            //       image: AssetImage('assets/images/profile.jpg'),
+            //     ),
+            //   ),
+            // )
           ]),
         ),
-        UserInfoWidget(),
-        PaidPartyWidget(),
+        const UserInfoWidget(),
+        const PaidPartyWidget(),
         Padding(
           padding: const EdgeInsets.all(kDefaultPadding),
           child: Column(
@@ -53,7 +53,7 @@ class profileBody extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        side: BorderSide(color: kPrimaryColor),
+                        side: const BorderSide(color: kPrimaryColor),
                       ),
                       onPressed: () {},
                       child: Padding(
@@ -66,16 +66,23 @@ class profileBody extends StatelessWidget {
                           ],
                         ),
                       ))),
-              Container(
+              const SizedBox(
+                height: kDefaultPadding / 2,
+              ),
+              SizedBox(
                 width: double.maxFinite,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        shadowColor: Colors.black38),
                     onPressed: signOut,
-                    child: const Text("Sign out")),
+                    child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+                      child: Text("Sign out"),
+                    )),
               )
             ],
           ),

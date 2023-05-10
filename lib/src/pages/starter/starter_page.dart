@@ -109,17 +109,24 @@ class _StartPageState extends State<StartPage> {
         decoration: const BoxDecoration(
           gradient: kDefaultBG,
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(50),
+        child: Padding(
+          padding: const EdgeInsets.all(kDefaultPadding),
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(),
-                Image.asset(
-                  "assets/images/logo.png",
-                  height: 240,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenWidth = constraints.maxWidth;
+                    final double logoHeight =
+                        screenWidth > 500 ? 240 : screenWidth * 0.48;
+                    return Image.asset(
+                      "assets/images/logo.png",
+                      height: logoHeight,
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 Image.asset(
@@ -127,21 +134,27 @@ class _StartPageState extends State<StartPage> {
                   height: 80,
                 ),
                 const SizedBox(height: 20),
-                const SizedBox(
+                SizedBox(
                   width: 300,
                   child: Text(
-                    "Split expenses with ease! \n Our app simplifies cost calculation \n for shared items among friends.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFFCCCCCC),
-                      fontSize: 18,
-                    ),
-                  ),
+                      "Split expenses with ease! \n Our app simplifies cost calculation \n for shared items among friends.",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: kSecondaryColor)),
                 ),
                 const Spacer(),
-                _buildButton(context),
-                const SizedBox(
-                  height: 30,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenWidth = constraints.maxWidth;
+                    final double buttonWidth =
+                        screenWidth > 500 ? 500 : screenWidth;
+                    return SizedBox(
+                      width: buttonWidth,
+                      child: _buildButton(context),
+                    );
+                  },
                 ),
               ],
             ),
@@ -170,7 +183,6 @@ class _StartPageState extends State<StartPage> {
             children: [
               Expanded(
                 child: Container(
-                  height: 0.3,
                   color: const Color(0xFFCCCCCC),
                 ),
               ),
@@ -188,7 +200,6 @@ class _StartPageState extends State<StartPage> {
               ),
               Expanded(
                 child: Container(
-                  height: 0.3,
                   color: const Color(0xFFCCCCCC),
                 ),
               ),

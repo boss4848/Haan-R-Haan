@@ -47,6 +47,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -66,8 +69,8 @@ class _HomePageState extends State<HomePage> {
             element: _buildPartyItem(
               partyName: "Party name",
               date: "Tue 18 Apr 22:26",
-              subTitle: "· 6 members",
-              detail: "Total amount 600 baht",
+              subTitle: " 6 ",
+              detail: "Total 600 baht",
               price: -500,
               navigator: () {
                 Navigator.push(
@@ -86,10 +89,10 @@ class _HomePageState extends State<HomePage> {
             lastChild: "order by price",
           ),
           ShadowContainer(
-            element: _buildPartyItem(
+            element: _buildPartyItemMember(
               partyName: "Party name",
               date: "Tue 18 Apr 22:26",
-              subTitle: "· username (owner)",
+              subTitle: "PatthadolRaks",
               detail: "Debt",
               price: 1300,
               navigator: () {
@@ -156,8 +159,8 @@ class _HomePageState extends State<HomePage> {
                             "Let's break bread, ${userData["username"]}?",
                             "Dine with me, ${userData["username"]}?",
                             "Food's better shared, ${userData["username"]}.",
-                            "Feast together, my treat, ${userData["username"]}?",
-                            "Good food and company, ${userData["username"]}?",
+                            "Feast together, my treat, \n ${userData["username"]}?",
+                            "Good food and company, \n ${userData["username"]}?",
                           ];
                           return Text(
                             greetingPhrases[
@@ -208,7 +211,8 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
                     partyName,
@@ -219,9 +223,131 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(width: 3),
+                  const Text(
+                    '·',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  const Icon(
+                    CupertinoIcons.person_2_fill,
+                    size: 16,
+                    color: kPrimaryColor,
+                  ),
                   Text(
                     // "· 6 members",
                     subTitle,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 3),
+              Text(
+                date,
+                style: const TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: redPastelColor,
+                    ),
+                    child: Text(
+                      "$price baht",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    detail,
+                    style: const TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => navigator(),
+                child: const Icon(
+                  CupertinoIcons.back,
+                  textDirection: TextDirection.rtl,
+                  color: kPrimaryColor,
+                  size: 20,
+                ),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Padding _buildPartyItemMember({
+    required String partyName,
+    required String date,
+    required String subTitle,
+    required String detail,
+    required int price,
+    required Function navigator,
+  }) {
+    final abbreviatedSubTitle =
+        subTitle.length > 5 ? '${subTitle.substring(0, 5)}...' : subTitle;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    partyName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  const Text(
+                    '·',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    abbreviatedSubTitle,
                     style: const TextStyle(
                       fontSize: 13,
                       color: kPrimaryColor,

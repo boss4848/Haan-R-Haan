@@ -112,14 +112,14 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
           element: _buildHistoryPartyItem(
             partyName: "Party name",
             date: "Tue 18 Apr 22:26",
-            subTitle: "· 6 members",
-            detail: "Total amount 600 baht",
+            subTitle: "6",
+            detail: "Total 600 baht",
             status: isBillpaid,
             navigator: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const OwnerBillDetailPage(),
+                    builder: (context) => const MemberBillDetail(),
                   ));
             },
           ),
@@ -147,7 +147,8 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
                     partyName,
@@ -158,6 +159,20 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
                     ),
                   ),
                   const SizedBox(width: 3),
+                  const Text(
+                    '·',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  const Icon(
+                    CupertinoIcons.person_2_fill,
+                    size: 16,
+                    color: kPrimaryColor,
+                  ),
+                  const SizedBox(width: 3),
                   Text(
                     // "· 6 members",
                     subTitle,
@@ -165,7 +180,7 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
                       fontSize: 13,
                       color: kPrimaryColor,
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 3),

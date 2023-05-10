@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/pages/bill_detail/member_bill_detail/widgets/memberAndExpenses.dart';
 import 'package:haan_r_haan/src/pages/bill_detail/member_bill_detail/widgets/promptpay_member.dart';
 import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/MemberAndBill.dart';
 import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/promptPay.dart';
@@ -109,7 +110,7 @@ class _foodlistForMemberState extends State<foodlistForMember> {
           const SizedBox(
             height: kDefaultPadding,
           ),
-          MemberAndExpenses(allMember: widget.party.allMember),
+          MemberAndExpensesForMember(allMember: widget.party.allMember),
           const SizedBox(
             height: kDefaultPadding,
           ),
