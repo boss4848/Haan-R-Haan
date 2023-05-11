@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/models/food_model.dart';
-import 'package:haan_r_haan/src/pages/login/widgets/button.dart';
 import 'package:haan_r_haan/src/pages/select_member/widgets/member_item.dart';
 import 'package:haan_r_haan/src/widgets/input_box.dart';
 import 'package:haan_r_haan/src/widgets/shadow_container.dart';
@@ -11,7 +10,7 @@ import 'package:promptpay_qrcode_generate/promptpay_qrcode_generate.dart';
 import '../../../constant/constant.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/user_model.dart';
+import '../../models/user_model_draft.dart';
 import '../bill_detail/owner_bill_detail/widgets/promptPay.dart';
 import '../select_food/widgets/food_item.dart';
 import '../select_food/widgets/member.dart';

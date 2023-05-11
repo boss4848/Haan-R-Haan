@@ -185,7 +185,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
       "updatedAt": Timestamp.now(),
       "payments": memberPayments,
       "paidCount": 0,
-      "totalLent": -(totalAmount),
+      "totalLent": -totalAmount,
     });
   }
 
@@ -417,7 +417,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                     child: InputBox(
                       label: "Food name",
                       controller: foodNameController,
-                      errorText: "errorText",
+                      errorText: "",
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -426,7 +426,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                     child: InputBox(
                       label: "Price",
                       controller: priceController,
-                      errorText: "err",
+                      errorText: "",
                     ),
                   ),
                   const SizedBox(width: 10),

@@ -314,7 +314,11 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
                             .collection('parties')
                             .doc(widget.partyID)
                             .delete();
+                        // Navigator.pop(context); // remove the dialog
+                        // if (Navigator.canPop(context)) {
+                        //   // remove the party page only if it exists in the stack
                         Navigator.pop(context);
+                        // }
                       },
                       child: const Icon(
                         CupertinoIcons.trash_fill,
@@ -409,7 +413,7 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
                             _buildStatus(
                               context: context,
                               sub: "TOTAL LENT",
-                              value: -(totalLent.ceil()),
+                              value: totalLent.ceil(),
                               unit: "฿",
                             ),
                           ],
@@ -431,22 +435,10 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
     AsyncSnapshot<String> currentUser,
   ) {
     final payments = parties?.data()?['payments'] as List<dynamic>?;
-    // final currentUserPayment = payments?.firstWhere((payment) {
-    //   print("payment['id'] ${payment['id']}");
-    //   return payment['id'] == currentUser;
-    // }, orElse: () => null);
-    // print("payments=== ${payments}");
-    // payments?.map((p) {
-    //   // if (payment['id'] == currentUser.data) {
-    //   print("------------------");
-    //   print(p['id']);
-    //   // }
-    // });
-
     double amount = 0.0;
     for (var i = 0; i < payments!.length; i++) {
       if (payments[i]['id'] == currentUser.data) {
-        amount = payments[i]['payment'];
+        amount = payments[i]['payment'].toDouble();
       }
     }
 
@@ -749,10 +741,10 @@ class _PaymentCheckboxState extends State<PaymentCheckbox> {
 
                         if (isPaid) {
                           paidCount++;
-                          totalLent -= paymentAmount;
+                          totalLent += paymentAmount;
                         } else if (paidCount > 0) {
                           paidCount--;
-                          totalLent += paymentAmount;
+                          totalLent -= paymentAmount;
                         }
                         break;
                       }
