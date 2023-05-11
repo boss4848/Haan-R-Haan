@@ -46,13 +46,13 @@ class CustomAppBar extends StatelessWidget {
                       children: [
                         _buildStatus(
                           image: "assets/images/dept.png",
-                          amount: snapshot.data!["sumTotalDebt"].toInt(),
+                          amount: snapshot.data!["sumTotalDebt"] ?? 0.0,
                           title: "TOTAL DEBT",
                         ),
                         const VerticalDivider(thickness: 1),
                         _buildStatus(
                           image: "assets/images/bitcoin.png",
-                          amount: snapshot.data!["sumTotalLent"].toInt(),
+                          amount: snapshot.data!["sumTotalLent"] ?? 0.0,
                           title: "TOTAL LENT",
                         ),
                       ],
@@ -65,8 +65,11 @@ class CustomAppBar extends StatelessWidget {
     );
   }
 
-  Column _buildStatus(
-      {required String title, required String image, int amount = 0}) {
+  Column _buildStatus({
+    required String title,
+    required String image,
+    double amount = 0,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +79,8 @@ class CustomAppBar extends StatelessWidget {
             Image.asset(image),
             const SizedBox(width: 10),
             Text(
-              "$amount ฿",
+              //fix 2 decimal
+              "${amount.toStringAsFixed(0)} ฿",
               style: const TextStyle(
                 color: kPrimaryColor,
                 fontSize: 18,

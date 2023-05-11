@@ -175,7 +175,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
       "payments": memberPayments,
       "paidCount": 0,
       "totalLent": -totalAmount,
-      // 'sumTotalLent': 0,
+      'sumTotalLent': 0,
     });
     //get user iD
     String userID = await FirebaseFirestore.instance

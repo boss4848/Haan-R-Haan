@@ -93,7 +93,29 @@ class _HomePageState extends State<HomePage> {
 
               if (snapshot.hasData) {
                 if (snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('No parties.'));
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const TitleBar(
+                        title: "Party List",
+                        subTitle: "as owner - 0 parties",
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          decoration: boxShadow_1,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          child: const Text(
+                            'There is no party yet. Create one!',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  );
                 } else {
                   final parties = snapshot.data!.docs.toList();
                   return Column(
@@ -157,7 +179,29 @@ class _HomePageState extends State<HomePage> {
 
               if (snapshot.hasData) {
                 if (snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('No parties.'));
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const TitleBar(
+                        title: "Party List",
+                        subTitle: "as member - 0 parties",
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          decoration: boxShadow_1,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          child: const Text(
+                            'Try to join a party!',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  );
                 } else {
                   final parties = snapshot.data!.docs.toList();
                   return Column(
