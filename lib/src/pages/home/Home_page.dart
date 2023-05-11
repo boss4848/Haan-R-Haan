@@ -181,6 +181,7 @@ class _HomePageState extends State<HomePage> {
                             (index) {
                               return _buildPartyItem(
                                 party: parties[index],
+                                ownerName: parties[index]['ownerName'],
                               );
                             },
                           ),
@@ -301,7 +302,7 @@ class _HomePageState extends State<HomePage> {
   Padding _buildPartyItem({
     required QueryDocumentSnapshot<Object?> party,
     // required bool isDraft,
-    // required String partyName,
+    String ownerName = "",
     // required String date,
     // required String subTitle,
     // required String detail,
@@ -342,13 +343,21 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               const SizedBox(height: 3),
-              Text(
-                "${party['members'].length} members",
-                style: const TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 13,
-                ),
-              ),
+              ownerName != ""
+                  ? Text(
+                      "by $ownerName",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: kPrimaryColor,
+                      ),
+                    )
+                  : Text(
+                      "${party['members'].length} members",
+                      style: const TextStyle(
+                        color: kPrimaryColor,
+                        fontSize: 13,
+                      ),
+                    ),
             ],
           ),
           const Spacer(),
