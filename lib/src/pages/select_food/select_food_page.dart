@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/login/widgets/button.dart';
+import 'package:haan_r_haan/src/models/billDetail_models.dart';
+import 'package:haan_r_haan/src/models/food_model.dart';
 import 'package:haan_r_haan/src/pages/select_food/widgets/member.dart';
 import 'package:haan_r_haan/src/pages/select_member/widgets/button_outlined.dart';
 import 'package:haan_r_haan/src/pages/select_member/widgets/member_item.dart';
@@ -9,10 +11,16 @@ import 'package:haan_r_haan/src/widgets/title.dart';
 import '../../../constant/constant.dart';
 import 'package:intl/intl.dart';
 
+import '../../models/user_model_draft.dart';
+import '../../widgets/button.dart';
 import 'widgets/food_item.dart';
 
 class SelectFoodPage extends StatefulWidget {
-  const SelectFoodPage({super.key});
+  final String partyID;
+  const SelectFoodPage({
+    this.partyID = "",
+    super.key,
+  });
 
   @override
   State<SelectFoodPage> createState() => _SelectFoodPageState();
@@ -24,19 +32,162 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
     return formatter.format(dateTime);
   }
 
-  List<String> friends = [
-    "John",
-    "Doe",
-    "Mark",
-    "Zuckerberg",
-    "Elon",
-    "Musk",
-    "Bill",
-    "Gates",
-    "Steve",
-    "Jobs",
-    "Jeff",
-  ];
+  ValueNotifier<List<FoodModel>> foods = ValueNotifier<List<FoodModel>>([]);
+  ValueNotifier<List<UserModel>> selectedMembers =
+      ValueNotifier<List<UserModel>>([]);
+  ValueNotifier<bool> selectAll = ValueNotifier<bool>(false);
+
+  void addFood() {
+    if (foodNameController.text.isEmpty ||
+        priceController.text.isEmpty ||
+        selectedMembers.value.isEmpty) return;
+    List<UserModel> members = [...selectedMembers.value];
+    print("members: $members");
+    final newFood = FoodModel(
+      foodName: foodNameController.text,
+      foodPrice: double.parse(priceController.text),
+      eaters: members,
+    );
+    //print value off newFood
+    print("newFood: $newFood");
+    print("newFood.foodName: ${newFood.foodName}");
+    print("newFood.foodPrice: ${newFood.foodPrice}");
+    print("newFood.eaters: ${newFood.eaters}");
+    for (var i = 0; i < newFood.eaters.length; i++) {
+      print("newFood.eaters[i].name: ${newFood.eaters[i].username}");
+    }
+
+    foods.value = [...foods.value, newFood];
+
+    foodNameController.clear();
+    priceController.clear();
+    // selectedMembers.value.clear();
+    // selectAll.value = false;
+    resetSelectedMembers();
+    print("members check: $members");
+  }
+
+  void deleteFood(FoodModel food) {
+    foods.value.remove(food);
+    foods.notifyListeners();
+  }
+
+  void toggleSelectedMember(UserModel member) {
+    if (selectedMembers.value.contains(member)) {
+      selectedMembers.value.remove(member);
+    } else {
+      selectedMembers.value.add(member);
+    }
+    print("selectedMembers: ${selectedMembers.value}");
+
+    selectedMembers.notifyListeners();
+  }
+
+  void resetSelectedMembers() {
+    if (selectAll.value) {
+      _handleSelectAll(selectedMembers.value);
+    } else {
+      selectedMembers.value.clear();
+      selectedMembers.notifyListeners(); // Notify listeners to update the UI
+    }
+    selectAll.value = false;
+  }
+
+  void _handleSelectAll(List<UserModel> friends) {
+    if (selectAll.value) {
+      selectedMembers.value.clear();
+      selectAll.value = false;
+    } else {
+      selectedMembers.value = List<UserModel>.from(friends);
+      selectAll.value = true;
+    }
+    selectedMembers.notifyListeners();
+  }
+
+  Future<List<UserModel>> fetchMemberDetails(List<String> members) async {
+    print("members: $members");
+
+    List<Future<UserModel>> memberFutures = members.map((member) async {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('uid', isEqualTo: member)
+          .get();
+
+      DocumentSnapshot doc = querySnapshot.docs[0];
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      UserModel newMember = UserModel(
+        id: data['uid'] ?? '',
+        username: data['username'] ?? '',
+        email: data['email'] ?? '',
+        friendList: [],
+        phoneNumber: data['phoneNumber'] ?? '',
+      );
+
+      return newMember;
+    }).toList();
+
+    List<UserModel> membersDetail = await Future.wait(memberFutures);
+    print("membersDetail: $membersDetail");
+
+    return membersDetail;
+  }
+
+  void onCreateParty() {
+    // Calculate the total amount
+    double totalAmount =
+        foods.value.fold(0, (sum, food) => sum + food.foodPrice);
+
+    // Calculate each member's payment and set isPaid to false
+    // Map<String, Map<String, dynamic>> memberPayments = {};
+    // for (var food in foods.value) {
+    //   double pricePerEater = food.foodPrice / food.eaters.length;
+    //   for (var eater in food.eaters) {
+    //     if (memberPayments.containsKey(eater.id)) {
+    //       memberPayments[eater.id]!['payment'] =
+    //           memberPayments[eater.id]!['payment'] + pricePerEater;
+    //     } else {
+    //       memberPayments[eater.id] = {
+    //         'payerID': food.eaters[0].id,
+    //         'payment': pricePerEater,
+    //         'isPaid': false,
+    //       };
+    //     }
+    //   }
+    // }
+    List<Map<String, dynamic>> memberPayments = [];
+    for (var food in foods.value) {
+      double pricePerEater = food.foodPrice / food.eaters.length;
+      for (var eater in food.eaters) {
+        int existingIndex = memberPayments
+            .indexWhere((mp) => mp.containsKey('id') && mp['id'] == eater.id);
+        if (existingIndex >= 0) {
+          memberPayments[existingIndex]['payment'] =
+              memberPayments[existingIndex]['payment'] + pricePerEater;
+        } else {
+          memberPayments.add({
+            'id': eater.id,
+            'payerID': food.eaters[0].id,
+            'payment': pricePerEater,
+            'isPaid': false,
+          });
+        }
+      }
+    }
+
+    // Update the Firestore document
+    FirebaseFirestore.instance
+        .collection('parties')
+        .doc(widget.partyID)
+        .update({
+      "foods": foods.value.map((food) => food.toJson()).toList(),
+      "totalAmount": totalAmount,
+      "isDraft": false,
+      "updatedAt": Timestamp.now(),
+      "payments": memberPayments,
+      "paidCount": 0,
+      "totalLent": -(totalAmount),
+    });
+  }
 
   List<bool> selectedFriends = List.filled(11, false);
   final foodNameController = TextEditingController();
@@ -45,16 +196,51 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          _buildContent(context),
-          _buildBanner(context),
-        ],
+      body: FutureBuilder(
+        future: FirebaseFirestore.instance
+            .collection('parties')
+            .doc(widget.partyID)
+            .get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Something went wrong"),
+            );
+          }
+          return Stack(
+            children: [
+              _buildContent(
+                context,
+                snapshot.data?["members"].cast<String>().toList(),
+              ),
+              _buildBanner(
+                context,
+                snapshot.data?["partyName"],
+                snapshot.data?["ownerName"],
+                snapshot.data?["partyDesc"],
+                snapshot.data?["members"].length,
+                snapshot.data?["createdAt"],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Stack _buildBanner(BuildContext context) {
+  Stack _buildBanner(
+    BuildContext context,
+    String partyName,
+    String ownerName,
+    String desc,
+    int members,
+    Timestamp createAt,
+  ) {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -88,9 +274,9 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Party name",
-                        style: TextStyle(
+                      Text(
+                        partyName,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -100,10 +286,10 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            "Owner name",
-                            style:
-                                TextStyle(fontSize: 19, color: kSecondaryColor),
+                          Text(
+                            ownerName,
+                            style: const TextStyle(
+                                fontSize: 19, color: kSecondaryColor),
                           ),
                           const SizedBox(width: 7),
                           Text(
@@ -143,9 +329,9 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                     ),
                     color: greyBackgroundColor,
                   ),
-                  child: const Text(
-                    "Desctiption",
-                    style: TextStyle(
+                  child: Text(
+                    desc,
+                    style: const TextStyle(
                       fontSize: 19,
                       color: kPrimaryColor,
                     ),
@@ -163,9 +349,9 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                     children: [
                       _buildStatus(
                         context: context,
-                        sub: "SELECTED",
-                        value: 10,
-                        unit: "people",
+                        sub: "IN THE PARTY",
+                        value: members,
+                        unit: "Friends",
                       ),
                       Container(
                         width: 1.2,
@@ -175,7 +361,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                       _buildStatus(
                         context: context,
                         sub: "JOIN BY LINK",
-                        value: 20,
+                        value: 0,
                         unit: "Members",
                       ),
                       Container(
@@ -183,11 +369,16 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                         height: 50,
                         color: greyBackgroundColor,
                       ),
-                      _buildStatus(
-                        context: context,
-                        sub: "ADDED",
-                        value: 2,
-                        unit: "Foods",
+                      ValueListenableBuilder(
+                        valueListenable: foods,
+                        builder: (context, value, child) {
+                          return _buildStatus(
+                            context: context,
+                            sub: "ADDED",
+                            value: value.length,
+                            unit: "Foods",
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -200,7 +391,10 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
     );
   }
 
-  Container _buildContent(BuildContext context) {
+  Container _buildContent(
+    BuildContext context,
+    List<String> members,
+  ) {
     return Container(
       color: blueBackgroundColor,
       height: double.infinity,
@@ -249,7 +443,9 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                           ),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        addFood();
+                      },
                       child: const Text("Add"),
                     ),
                   ),
@@ -261,47 +457,132 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: const [
-                  MemberItem(name: "Passakorn"),
-                  MemberItem(name: "Boss"),
-                  MemberItem(name: "Yo"),
-                  MemberItem(name: "Dol"),
-                  MemberItem(name: "Fahsai"),
-                  MemberItem(name: "Gift"),
-                  MemberItem(name: "Oil"),
-                  MemberItem(name: "Mark"),
-                  MemberItem(name: "Thanyakan"),
-                  MemberItem(name: "Vatcharamai"),
-                  MemberItem(name: "Patthadol"),
-                  SizedBox(
-                    width: double.infinity,
-                    child: MemberItem(
-                      name: "Select all",
-                    ),
-                  ),
-                ],
+              FutureBuilder<List<UserModel>>(
+                future: fetchMemberDetails(members),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.data!.isEmpty) {
+                    // return Container();
+                    return const Center(child: Text('No friends.'));
+                  } else {
+                    final friends = snapshot.data!;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: List.generate(
+                            friends.length,
+                            (index) {
+                              return MemberItem(
+                                friend: friends[index],
+                                onToggleSelected: (member) =>
+                                    toggleSelectedMember(member),
+                                selectedFriends: selectedMembers,
+                                onUpdateSelectAll: () {
+                                  selectAll.value = false;
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ValueListenableBuilder<bool>(
+                            valueListenable: selectAll,
+                            builder: (context, value, child) {
+                              return InkWell(
+                                onTap: () => _handleSelectAll(snapshot.data!),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: value
+                                        ? greenPastelColor
+                                        : redPastelColor,
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        value
+                                            ? CupertinoIcons.minus
+                                            : CupertinoIcons.add,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Text(
+                                        "Select all",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                      ],
+                    );
+                  }
+                },
               ),
-              const TitleBar(
-                title: "Food List",
-                subTitle: "3 items",
-                isNoPadding: true,
+              ValueListenableBuilder(
+                valueListenable: foods,
+                builder: (context, value, child) {
+                  return TitleBar(
+                    title: "Food List",
+                    subTitle: "${value.length} foods",
+                    isNoPadding: true,
+                  );
+                },
               ),
               const SizedBox(height: 10),
-              const FoodItem(),
-              const SizedBox(height: 10),
-              const FoodItem(),
-              const SizedBox(height: 10),
-              const FoodItem(),
+              ValueListenableBuilder(
+                  valueListenable: foods,
+                  builder: (context, value, child) {
+                    return Column(
+                      children: List.generate(
+                        foods.value.length,
+                        (index) {
+                          print('eaters test: ${foods.value[index].eaters}');
+                          return FoodItem(
+                            food: foods.value[index],
+                            // foodName: foods.value[index].foodName,
+                            // foodPrice: foods.value[index].foodPrice,
+                            // eaters: foods.value[index].eaters,
+                            onDeleted: () => deleteFood(foods.value[index]),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+              // const FoodItem(),
+              // const SizedBox(height: 10),
+              // const FoodItem(),
+              // const SizedBox(height: 10),
+              // const FoodItem(),
               const SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Button(() {
+                  onCreateParty();
+
                   Navigator.pop(context);
                   Navigator.pop(context);
-                  Navigator.pop(context);
+                  // Navigator.pop(context);
                 }, "Create Party"),
               ),
               const SizedBox(height: 80),

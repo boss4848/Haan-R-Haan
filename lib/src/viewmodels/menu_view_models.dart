@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../models/menu_models.dart';
+import '../models/menu_model.dart';
 
 class MenuViewModel {
   List<MenuModel> getMenus() {

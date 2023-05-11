@@ -4,7 +4,7 @@ import 'package:haan_r_haan/src/services/notification_service.dart';
 import 'package:haan_r_haan/src/viewmodels/auth_view_model.dart';
 import 'package:haan_r_haan/src/viewmodels/friend_view_model.dart';
 import 'package:haan_r_haan/src/viewmodels/party_view_model.dart';
-import 'package:haan_r_haan/src/viewmodels/user_view_model.dart';
+import 'package:haan_r_haan/src/viewmodels/user_view_model_draft.dart';
 import 'package:provider/provider.dart';
 
 import 'pages/auth/auth_page.dart';

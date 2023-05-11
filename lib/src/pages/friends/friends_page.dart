@@ -1,9 +1,14 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
-import 'package:haan_r_haan/src/widgets/shadow_container.dart';
-import 'package:haan_r_haan/src/widgets/show_more.dart';
 import 'package:haan_r_haan/src/widgets/title.dart';
-
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../models/user_model_draft.dart';
+import '../../viewmodels/friend_view_model.dart';
+import '../../viewmodels/user_view_model_draft.dart';
 import 'widgets/custom_appbar.dart';
 
 class FriendsPage extends StatefulWidget {
@@ -15,7 +20,85 @@ class FriendsPage extends StatefulWidget {
 
 class _FriendsPageState extends State<FriendsPage> {
   final _scrollController = TrackingScrollController();
-  final searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  List<UserModel> _searchResults = [];
+
+  void onSendFriendRequest(String receiverID) async {
+    try {
+      final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+      final friendViewModel =
+          Provider.of<FriendViewModel>(context, listen: false);
+      final currentUserID = userViewModel.currentUserData?.id ?? "";
+      print("receiver: $receiverID");
+      print("sender: $currentUserID");
+
+      await friendViewModel.sendFriendRequest(currentUserID, receiverID);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Friend request sent!')),
+      );
+      setState(() {
+        _searchResults = [];
+        _searchController.clear();
+      });
+    } catch (e) {
+      // Show error message if there is an issue
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  void onAcceptFriendRequest(
+    String requestId,
+    String senderId,
+    String receiverId,
+  ) async {
+    final friendViewModel =
+        Provider.of<FriendViewModel>(context, listen: false);
+    await friendViewModel.acceptFriendRequest(
+      requestId,
+      senderId,
+      receiverId,
+    );
+    // Fetch updated friend requests
+    await friendViewModel.fetchFriendRequests(receiverId);
+  }
+
+  void onDeclineFriendRequest(
+    String requestId,
+    String receiverId,
+  ) async {
+    final friendViewModel =
+        Provider.of<FriendViewModel>(context, listen: false);
+    await friendViewModel.declineFriendRequest(requestId);
+    // Fetch updated friend requests
+    await friendViewModel.fetchFriendRequests(receiverId);
+  }
+
+  void onRemoveFriend(String friendUserId) async {
+    try {
+      final friendViewModel =
+          Provider.of<FriendViewModel>(context, listen: false);
+      final currentUserId =
+          Provider.of<UserViewModel>(context, listen: false).userID;
+
+      await friendViewModel.removeFriend(currentUserId, friendUserId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Friend removed!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    String formatted = DateFormat('EEE dd MMM HH:mm').format(dateTime);
+    return formatted;
+  }
 
   //Handle scroll
   late Color _backgroundColor;
@@ -28,11 +111,23 @@ class _FriendsPageState extends State<FriendsPage> {
     _offset = 0.0;
 
     _scrollController.addListener(_onScroll);
+
+    final friendViewModel =
+        Provider.of<FriendViewModel>(context, listen: false);
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    final userId =
+        userViewModel.currentUserData?.id ?? "nBuVKzmUjKUthSi6QziTafcbY0h2";
+    friendViewModel.fetchFriendRequests(userId);
+    friendViewModel.fetchFriendList(userId);
+
+    friendViewModel.listenForNewFriendRequests(userId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+
     return Stack(
       children: [
         SingleChildScrollView(
@@ -50,35 +145,130 @@ class _FriendsPageState extends State<FriendsPage> {
                       gradient: kDefaultBG,
                     ),
                   ),
-                  CustomAppBar(controller: searchController),
+                  CustomAppBar(
+                    controller: _searchController,
+                    onSubmitted: (query) {
+                      userViewModel.searchUsersByUsername(query).then((value) {
+                        setState(() {
+                          _searchResults = value;
+                        });
+                      });
+                    },
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
-              const TitleBar(
-                title: "Friend Request",
-                subTitle: "3 request",
-                isNoSpacer: true,
-              ),
-              ShadowContainer(
-                length: 3,
-                element: _buildFriendRequestItem(
-                  username: "Passakorn",
-                  date: "Tue 19 Apr 22:26",
+              if (_searchResults.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 20,
+                    bottom: 10,
+                  ),
+                  decoration: boxShadow_1,
+                  child: Column(
+                    children: [
+                      if (_searchResults.isNotEmpty)
+                        for (var i = 0; i < _searchResults.length; i++)
+                          _buildUserItem(
+                            userModel: _searchResults[i],
+                          ),
+                    ],
+                  ),
                 ),
+              StreamBuilder<List<Map<String, dynamic>>>(
+                stream:
+                    Provider.of<FriendViewModel>(context).friendRequestsStream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.data!.isEmpty) {
+                    return Container();
+                    // return const Center(child: Text('No friend requests.'));
+                  } else {
+                    final requests = snapshot.data!;
+
+                    return Column(
+                      children: [
+                        TitleBar(
+                          title: "Friend Request",
+                          subTitle: "${requests.length} requests",
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 20,
+                            bottom: 10,
+                          ),
+                          decoration: boxShadow_1,
+                          child: Column(
+                            children: List.generate(
+                              requests.length,
+                              (index) => _buildFriendRequestItem(
+                                requestId: requests[index]['id'],
+                                receiverId: requests[index]['receiverID'],
+                                senderId: requests[index]['senderID'],
+                                userModel: requests[index]['senderDetails'],
+                                date: requests[index]['timestamp'],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
-              const TitleBar(
-                title: "Friend List",
-                subTitle: " 2 friends",
-                isNoSpacer: true,
+              StreamBuilder<List<UserModel>>(
+                stream: Provider.of<FriendViewModel>(context).friendListStream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.data!.isEmpty) {
+                    return Container();
+                    // return const Center(child: Text('No friends.'));
+                  } else {
+                    final friends = snapshot.data!;
+
+                    return Column(
+                      children: [
+                        TitleBar(
+                          title: "Friends",
+                          subTitle: "${friends.length} friends",
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 20,
+                            bottom: 10,
+                          ),
+                          decoration: boxShadow_1,
+                          child: Column(
+                            children: List.generate(
+                              friends.length,
+                              (index) => _buildFriendItem(
+                                username: friends[index].username,
+                                email: friends[index].email,
+                                id: friends[index].id,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
-              ShadowContainer(
-                length: 2,
-                element: _buildFriendItem(
-                  username: "Passakorn",
-                  email: "passakorn_2@gmail.com",
-                ),
-              ),
-              const ShowMore(),
               const SizedBox(height: 30),
             ],
           ),
@@ -96,15 +286,33 @@ class _FriendsPageState extends State<FriendsPage> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Friends",
-                    style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: kSecondaryColor),
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      //refresh
+                      setState(() {
+                        _searchResults.clear();
+                        _searchController.clear();
+                      });
+
+                      final friendViewModel =
+                          Provider.of<FriendViewModel>(context, listen: false);
+                      final userViewModel =
+                          Provider.of<UserViewModel>(context, listen: false);
+                      final userId = userViewModel.currentUserData?.id ??
+                          "nBuVKzmUjKUthSi6QziTafcbY0h2";
+                      friendViewModel.fetchFriendRequests(userId);
+                      friendViewModel.fetchFriendList(userId);
+                    },
+                    child: const Text(
+                      "Friends",
+                      style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: kSecondaryColor),
+                    ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.notifications,
                     size: 36,
                     color: Colors.white,
@@ -119,8 +327,11 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   Padding _buildFriendRequestItem({
-    String? username,
-    String? date,
+    required String requestId,
+    required String senderId,
+    required String receiverId,
+    required DateTime date,
+    required UserModel userModel,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -130,7 +341,7 @@ class _FriendsPageState extends State<FriendsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                username ?? "Username",
+                userModel.username,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -139,7 +350,7 @@ class _FriendsPageState extends State<FriendsPage> {
               ),
               const SizedBox(height: 3),
               Text(
-                date ?? "Tue 19 Apr 22:26",
+                formatTimestamp(Timestamp.fromDate(date)),
                 style: const TextStyle(
                   color: kPrimaryColor,
                   fontSize: 13,
@@ -151,22 +362,33 @@ class _FriendsPageState extends State<FriendsPage> {
           _buildButton(
             buttonName: "Accept",
             backgroundColor: kPrimaryColor,
-            onPressed: () {},
+            onPressed: () {
+              print('accept');
+              onAcceptFriendRequest(requestId, senderId, receiverId);
+              // handleOnAccept(docID);
+            },
           ),
           const SizedBox(width: 8),
           _buildButton(
             buttonName: "Decline",
             backgroundColor: redPastelColor,
-            onPressed: () {},
+            onPressed: () {
+              print('decline');
+              onDeclineFriendRequest(requestId, receiverId);
+              // handleOnDecline(docID);
+            },
           ),
         ],
       ),
     );
   }
 
-  Padding _buildFriendItem({
-    String? username,
-    String? email,
+  Padding _buildUserItem({
+    // String docID = "",
+    // String? username,
+    // String? email,
+    required UserModel userModel,
+    // DocumentSnapshot? documentSnapshot,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -176,7 +398,7 @@ class _FriendsPageState extends State<FriendsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                username ?? "Username",
+                userModel.username,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -185,7 +407,52 @@ class _FriendsPageState extends State<FriendsPage> {
               ),
               const SizedBox(height: 3),
               Text(
-                email ?? "user_email@mail.com",
+                userModel.email,
+                style: const TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          _buildButton(
+            buttonName: "Add",
+            backgroundColor: kPrimaryColor,
+            onPressed: () {
+              // handleAddFriend(documentSnapshot!);
+              onSendFriendRequest(userModel.id);
+            },
+            // onPressed: () => addFriend(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildFriendItem({
+    required username,
+    required email,
+    required id,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                username,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: kPrimaryColor,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                email,
                 style: const TextStyle(
                   color: kPrimaryColor,
                   fontSize: 13,
@@ -197,7 +464,9 @@ class _FriendsPageState extends State<FriendsPage> {
           _buildButton(
             buttonName: "Remove",
             backgroundColor: redPastelColor,
-            onPressed: () {},
+            onPressed: () {
+              onRemoveFriend(id);
+            },
           ),
         ],
       ),
@@ -207,9 +476,10 @@ class _FriendsPageState extends State<FriendsPage> {
   TextButton _buildButton({
     required String buttonName,
     required Color backgroundColor,
-    required Function onPressed,
+    required Function()? onPressed,
   }) {
     return TextButton(
+      onPressed: onPressed,
       style: ButtonStyle(
         fixedSize: MaterialStateProperty.all(
           const Size(80, 32),
@@ -221,7 +491,6 @@ class _FriendsPageState extends State<FriendsPage> {
           backgroundColor,
         ),
       ),
-      onPressed: () => onPressed,
       child: Text(
         buttonName,
         style: const TextStyle(

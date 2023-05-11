@@ -1,16 +1,30 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/login/widgets/button.dart';
 import 'package:haan_r_haan/src/pages/select_member/widgets/button_outlined.dart';
 import 'package:haan_r_haan/src/pages/select_member/widgets/member_item.dart';
+import 'package:haan_r_haan/src/viewmodels/party_view_model.dart';
+import 'package:provider/provider.dart';
 import '../../../constant/constant.dart';
 import 'package:intl/intl.dart';
 
+import '../../models/party_model.dart';
+import '../../models/user_model_draft.dart';
+import '../../viewmodels/friend_view_model.dart';
+import '../../widgets/button.dart';
 import '../select_food/select_food_page.dart';
 import 'widgets/qr_code.dart';
 
 class SelectMemberPage extends StatefulWidget {
-  const SelectMemberPage({super.key});
+  final String partyID;
+  // final PartyModel party;
+  const SelectMemberPage({
+    super.key,
+    this.partyID = "",
+    // required this.party,
+  });
 
   @override
   State<SelectMemberPage> createState() => _SelectMemberPageState();
@@ -22,35 +36,132 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
     return formatter.format(dateTime);
   }
 
-  List<String> friends = [
-    "John",
-    "Doe",
-    "Mark",
-    "Zuckerberg",
-    "Elon",
-    "Musk",
-    "Bill",
-    "Gates",
-    "Steve",
-    "Jobs",
-    "Jeff",
-  ];
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    String formatted = DateFormat('EEE dd MMM HH:mm').format(dateTime);
+    return formatted;
+  }
 
-  List<bool> selectedFriends = List.filled(11, false);
+  // List<UserModel> selectedFriends = [];
+  ValueNotifier<List<UserModel>> selectedFriends =
+      ValueNotifier<List<UserModel>>([]);
+  ValueNotifier<bool> selectAll = ValueNotifier<bool>(false);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildContent(context),
-          _buildBanner(context),
-        ],
+  // List<bool> selectedFriends = List.filled(11, false);
+  void toggleSelectedFriend(UserModel friend) {
+    if (selectedFriends.value.contains(friend)) {
+      selectedFriends.value.remove(friend);
+    } else {
+      selectedFriends.value.add(friend);
+    }
+    print("selectedFriends: ${selectedFriends.value}");
+
+    selectedFriends.notifyListeners();
+  }
+
+  void _handleSelectAll(List<UserModel> friends) {
+    if (selectAll.value) {
+      selectedFriends.value.clear();
+      selectAll.value = false;
+    } else {
+      selectedFriends.value = List<UserModel>.from(friends);
+      selectAll.value = true;
+    }
+    selectedFriends.notifyListeners();
+  }
+
+  void onSubmit() {
+    if (selectedFriends.value.isEmpty) {
+      return;
+    }
+
+    final partyRef = FirebaseFirestore.instance.collection('parties').doc(
+          widget.partyID,
+        );
+
+    // Retrieve the current 'members' array from the document
+    partyRef.get().then((docSnapshot) {
+      if (docSnapshot.exists) {
+        List<dynamic> currentMembers = docSnapshot.get('members');
+
+        // Create a new list containing the IDs of the selected friends, without updating the first element
+        List<String> updatedMembers = [
+          currentMembers[0], // Keep the first element unchanged
+          ...selectedFriends.value.map((e) => e.id), // Add the selected friends
+        ];
+
+        // Remove duplicates, if any
+        updatedMembers = updatedMembers.toSet().toList();
+
+        // Update the 'members' array in the Firestore document
+        partyRef.update({'members': updatedMembers});
+      }
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectFoodPage(
+          partyID: widget.partyID,
+          // selectedFriends: selectedFriends.value,
+        ),
       ),
     );
   }
 
-  Stack _buildBanner(BuildContext context) {
+  @override
+  void dispose() {
+    selectedFriends.value.clear();
+    selectedFriends.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final partyViewModel = Provider.of<PartyViewModel>(context);
+    return Scaffold(
+      body: FutureBuilder(
+          future: FirebaseFirestore.instance
+              .collection('parties')
+              .doc(widget.partyID)
+              .get(),
+          builder: (context, snapshot) {
+            // print("snapshot: ${snapshot.data}");
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text("Something went wrong"),
+              );
+            }
+            // print("snapshot: ${snapshot.data?['partyName']}");
+            // print("snapshot: ${snapshot.data?['ownerID']}");
+            // print("snapshot: ${snapshot.data?['createdAt']}");
+            return Stack(
+              children: [
+                _buildContent(context, snapshot.data),
+                _buildBanner(
+                  context,
+                  snapshot.data?["partyName"],
+                  snapshot.data?["ownerName"],
+                  snapshot.data?["partyDesc"],
+                  snapshot.data?["createdAt"],
+                ),
+              ],
+            );
+          }),
+    );
+  }
+
+  Stack _buildBanner(
+    BuildContext context,
+    String partyName,
+    String ownerName,
+    String desc,
+    Timestamp createAt,
+  ) {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -84,9 +195,9 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Party name",
-                        style: TextStyle(
+                      Text(
+                        partyName,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -96,18 +207,18 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            "Owner name",
-                            style: TextStyle(
+                          Text(
+                            ownerName,
+                            style: const TextStyle(
                               fontSize: 19,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(width: 7),
                           Text(
-                            formatDateTime(DateTime.now()),
+                            "created at ${formatTimestamp(createAt)}",
                             style: const TextStyle(
-                              fontSize: 11,
-                            ),
+                                fontSize: 11, color: Colors.white),
                           ),
                         ],
                       ),
@@ -140,9 +251,9 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                     ),
                     color: greyBackgroundColor,
                   ),
-                  child: const Text(
-                    "Desctiption",
-                    style: TextStyle(
+                  child: Text(
+                    desc,
+                    style: const TextStyle(
                       fontSize: 19,
                       color: kPrimaryColor,
                     ),
@@ -158,11 +269,16 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                   ),
                   child: Row(
                     children: [
-                      _buildStatus(
-                        context: context,
-                        sub: "SELECTED",
-                        value: 10,
-                        unit: "people",
+                      ValueListenableBuilder<List<UserModel>>(
+                        valueListenable: selectedFriends,
+                        builder: (context, value, child) {
+                          return _buildStatus(
+                            context: context,
+                            sub: "SELECTED",
+                            value: value.length,
+                            unit: "Friends",
+                          );
+                        },
                       ),
                       Container(
                         width: 1.2,
@@ -172,7 +288,7 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                       _buildStatus(
                         context: context,
                         sub: "JOIN BY LINK",
-                        value: 20,
+                        value: 0,
                         unit: "Members",
                       ),
                     ],
@@ -186,7 +302,10 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
     );
   }
 
-  Container _buildContent(BuildContext context) {
+  Container _buildContent(
+    BuildContext context,
+    DocumentSnapshot<Map<String, dynamic>>? party,
+  ) {
     return Container(
       color: blueBackgroundColor,
       height: double.infinity,
@@ -205,28 +324,87 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: const [
-                  MemberItem(name: "Passakorn"),
-                  MemberItem(name: "Boss"),
-                  MemberItem(name: "Yo"),
-                  MemberItem(name: "Dol"),
-                  MemberItem(name: "Fahsai"),
-                  MemberItem(name: "Gift"),
-                  MemberItem(name: "Oil"),
-                  MemberItem(name: "Mark"),
-                  MemberItem(name: "Thanyakan"),
-                  MemberItem(name: "Vatcharamai"),
-                  MemberItem(name: "Patthadol"),
-                  SizedBox(
-                    width: double.infinity,
-                    child: MemberItem(
-                      name: "Select all",
-                    ),
-                  ),
-                ],
+              StreamBuilder<List<UserModel>>(
+                stream: Provider.of<FriendViewModel>(context).friendListStream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.data!.isEmpty) {
+                    return Container();
+                    // return const Center(child: Text('No friends.'));
+                  } else {
+                    final friends = snapshot.data!;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: List.generate(
+                            friends.length,
+                            (index) {
+                              return MemberItem(
+                                friend: friends[index],
+                                onToggleSelected: (friend) =>
+                                    toggleSelectedFriend(friend),
+                                selectedFriends: selectedFriends,
+                                onUpdateSelectAll: () {
+                                  selectAll.value = false;
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ValueListenableBuilder<bool>(
+                            valueListenable: selectAll,
+                            builder: (context, value, child) {
+                              return InkWell(
+                                onTap: () => _handleSelectAll(snapshot.data!),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: value
+                                        ? greenPastelColor
+                                        : redPastelColor,
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        value
+                                            ? CupertinoIcons.minus
+                                            : CupertinoIcons.add,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Text(
+                                        "Select all",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                      ],
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 20),
               Text(
@@ -252,12 +430,13 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Button(() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SelectFoodPage(),
-                    ),
-                  );
+                  onSubmit();
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const SelectFoodPage(),
+                  //   ),
+                  // );
                 }, "Next"),
               ),
               const SizedBox(height: 80),

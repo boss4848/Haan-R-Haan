@@ -43,6 +43,14 @@ class UserModel {
       'username': username,
     };
   }
+
+  UserModel.empty()
+      : uid = '',
+        email = '',
+        friendList = [],
+        history = [],
+        phoneNumber = '',
+        username = '';
 }
 
 class History {

@@ -4,7 +4,13 @@ import '../../../../constant/constant.dart';
 
 class CustomAppBar extends StatelessWidget {
   final TextEditingController controller;
-  const CustomAppBar({super.key, required this.controller});
+  final Function onSubmitted;
+  const CustomAppBar({
+    super.key,
+    required this.controller,
+    // required this.onChanged,
+    required this.onSubmitted,
+  });
   final double appBarSize = 65;
 
   @override
@@ -38,9 +44,8 @@ class CustomAppBar extends StatelessWidget {
                     ),
                   ),
                   controller: controller,
-                  onChanged: (value) {
-                    print(value);
-                  },
+                  onSubmitted: (value) => onSubmitted(value),
+                  // onChanged: (value) => onChanged(value),
                 ),
               ),
             ),

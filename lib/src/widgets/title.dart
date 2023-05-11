@@ -12,7 +12,7 @@ class TitleBar extends StatelessWidget {
   const TitleBar({
     required this.title,
     this.count,
-    required this.subTitle,
+    this.subTitle = "",
     this.isNoSpacer = false,
     super.key,
     this.lastChild,
