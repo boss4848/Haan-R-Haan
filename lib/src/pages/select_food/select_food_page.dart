@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/models/billDetail_models.dart';
@@ -132,28 +133,11 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
     return membersDetail;
   }
 
-  void onCreateParty() {
+  Future<void> onCreateParty() async {
     // Calculate the total amount
     double totalAmount =
         foods.value.fold(0, (sum, food) => sum + food.foodPrice);
 
-    // Calculate each member's payment and set isPaid to false
-    // Map<String, Map<String, dynamic>> memberPayments = {};
-    // for (var food in foods.value) {
-    //   double pricePerEater = food.foodPrice / food.eaters.length;
-    //   for (var eater in food.eaters) {
-    //     if (memberPayments.containsKey(eater.id)) {
-    //       memberPayments[eater.id]!['payment'] =
-    //           memberPayments[eater.id]!['payment'] + pricePerEater;
-    //     } else {
-    //       memberPayments[eater.id] = {
-    //         'payerID': food.eaters[0].id,
-    //         'payment': pricePerEater,
-    //         'isPaid': false,
-    //       };
-    //     }
-    //   }
-    // }
     List<Map<String, dynamic>> memberPayments = [];
     for (var food in foods.value) {
       double pricePerEater = food.foodPrice / food.eaters.length;
@@ -169,6 +153,11 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
             'payerID': food.eaters[0].id,
             'payment': pricePerEater,
             'isPaid': false,
+          });
+
+          // Update the sumTotalDept
+          FirebaseFirestore.instance.collection('users').doc(eater.id).update({
+            'sumTotalDebt': FieldValue.increment(pricePerEater),
           });
         }
       }
@@ -186,6 +175,29 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
       "payments": memberPayments,
       "paidCount": 0,
       "totalLent": -totalAmount,
+      // 'sumTotalLent': 0,
+    });
+    //get user iD
+    String userID = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get()
+        .then(
+          (value) => value.docs[0].id,
+        );
+
+    // Get the current user document
+    DocumentSnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userID).get();
+
+    // Get the current sumTotalLent value from the user document
+    double sumTotalLent = userSnapshot['sumTotalLent'].toDouble();
+
+    // Add the totalAmount to the sumTotalLent value
+    sumTotalLent += totalAmount;
+    // Update the sumTotalLent field in the user document
+    FirebaseFirestore.instance.collection('users').doc(userID).update({
+      'sumTotalLent': sumTotalLent.toDouble(),
     });
   }
 

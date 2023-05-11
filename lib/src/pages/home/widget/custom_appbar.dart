@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -29,22 +31,33 @@ class CustomAppBar extends StatelessWidget {
               height: appBarSize,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: boxShadow_1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatus(
-                    image: "assets/images/dept.png",
-                    amount: 1100,
-                    title: "TOTAL DEPT",
-                  ),
-                  const VerticalDivider(thickness: 1),
-                  _buildStatus(
-                    image: "assets/images/bitcoin.png",
-                    amount: 1000,
-                    title: "TOTAL LENT",
-                  ),
-                ],
-              ),
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("users")
+                      .where('email',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                      .snapshots()
+                      .map(
+                        (event) => event.docs.first.data(),
+                      ),
+                  builder: (context, snapshot) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatus(
+                          image: "assets/images/dept.png",
+                          amount: snapshot.data!["sumTotalDebt"].toInt(),
+                          title: "TOTAL DEBT",
+                        ),
+                        const VerticalDivider(thickness: 1),
+                        _buildStatus(
+                          image: "assets/images/bitcoin.png",
+                          amount: snapshot.data!["sumTotalLent"].toInt(),
+                          title: "TOTAL LENT",
+                        ),
+                      ],
+                    );
+                  }),
             ),
           ),
         ],

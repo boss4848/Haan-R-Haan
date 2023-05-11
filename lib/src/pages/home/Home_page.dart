@@ -74,11 +74,13 @@ class _HomePageState extends State<HomePage> {
                 .where('email',
                     isEqualTo: FirebaseAuth.instance.currentUser!.email)
                 .snapshots()
-                .asyncMap((userSnapshot) => FirebaseFirestore.instance
-                    .collection("parties")
-                    .where('ownerID', isEqualTo: userSnapshot.docs[0].id)
-                    .snapshots()
-                    .first),
+                .asyncMap(
+                  (userSnapshot) => FirebaseFirestore.instance
+                      .collection("parties")
+                      .where('ownerID', isEqualTo: userSnapshot.docs[0].id)
+                      .snapshots()
+                      .first,
+                ),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

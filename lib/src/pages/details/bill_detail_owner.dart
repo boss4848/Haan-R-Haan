@@ -220,6 +220,7 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
                       snapshot.data?["members"].length,
                       snapshot.data?["createdAt"],
                       snapshot.data?["totalAmount"],
+                      snapshot.data?["paidCount"],
                       currentUser,
                     ),
                   ],
@@ -240,6 +241,7 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
     int members,
     Timestamp createAt,
     double totalAmount,
+    int paidCount,
     AsyncSnapshot<String> currentUser,
   ) {
     return Stack(
@@ -310,14 +312,36 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
                   if (ownerID == currentUser.data)
                     GestureDetector(
                       onTap: () {
-                        FirebaseFirestore.instance
-                            .collection('parties')
-                            .doc(widget.partyID)
-                            .delete();
+                        //Need to check all the checkbox before delete
+                        if (members == paidCount) {
+                          FirebaseFirestore.instance
+                              .collection('parties')
+                              .doc(widget.partyID)
+                              .delete();
+                          Navigator.pop(context);
+                        } else {
+                          // showDialog(
+                          //   context: context,
+                          //   builder: (context) {
+                          //     return AlertDialog(
+                          //       title: const Text("Delete Party"),
+                          //       content: const Text(
+                          //           "You can only delete the party when all the members have paid."),
+                          //       actions: [
+                          //         TextButton(
+                          //           onPressed: () {
+                          //             Navigator.pop(context);
+                          //           },
+                          //           child: const Text("OK"),
+                          //         ),
+                          //       ],
+                          //     );
+                          //   },
+                          // );
+                        }
                         // Navigator.pop(context); // remove the dialog
                         // if (Navigator.canPop(context)) {
                         //   // remove the party page only if it exists in the stack
-                        Navigator.pop(context);
                         // }
                       },
                       child: const Icon(
@@ -519,11 +543,19 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
                   );
                 }),
               ),
-              TitleBar(
-                title: "Who has paid?",
-                subTitle: "0/${members.length} members",
-                isNoPadding: true,
-              ),
+              StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('parties')
+                      .doc(widget.partyID)
+                      .snapshots(),
+                  builder: (context, snap) {
+                    return TitleBar(
+                      title: "Who has paid?",
+                      subTitle:
+                          "${snap.data?['paidCount']}/${members.length} members",
+                      isNoPadding: true,
+                    );
+                  }),
               Container(
                 padding: const EdgeInsets.only(
                     top: 10, bottom: 10, right: 20, left: 5),
@@ -548,6 +580,7 @@ class _BillDetailOwnerPageState extends State<BillDetailOwnerPage> {
                                 isPaid: payerPayment['isPaid'] ?? false,
                                 payerId: payerPayment['id'],
                                 partyId: widget.partyID,
+                                ownerId: parties['ownerID'],
                               ),
                               FutureBuilder(
                                 future:
@@ -689,6 +722,7 @@ class PaymentCheckbox extends StatefulWidget {
   final bool isPaid;
   final String payerId;
   final String partyId;
+  final String ownerId;
 
   const PaymentCheckbox({
     super.key,
@@ -696,6 +730,7 @@ class PaymentCheckbox extends StatefulWidget {
     required this.isPaid,
     required this.payerId,
     required this.partyId,
+    required this.ownerId,
   });
   @override
   State<PaymentCheckbox> createState() => _PaymentCheckboxState();
@@ -724,13 +759,25 @@ class _PaymentCheckboxState extends State<PaymentCheckbox> {
                   .doc(widget.partyId);
 
               partyRef.get().then(
-                (docSnapshot) {
+                (docSnapshot) async {
                   if (docSnapshot.exists) {
                     List<dynamic> currentPayments = docSnapshot.get('payments');
                     int paidCount = docSnapshot.get('paidCount') ?? 0;
                     // double totalLent = docSnapshot.get('totalLent') ?? 0.0;
                     double totalLent =
                         (docSnapshot.get('totalLent') ?? 0.0).toDouble();
+
+                    // Get the current user document
+                    DocumentSnapshot userSnapshot = await FirebaseFirestore
+                        .instance
+                        .collection('users')
+                        .doc(widget.ownerId)
+                        .get();
+                    // member id
+
+                    // Get the current sumTotalLent value from the user document
+                    double sumTotalLent =
+                        userSnapshot['sumTotalLent'].toDouble();
 
                     double paymentAmount = 0.0;
                     for (var payment in currentPayments) {
@@ -742,9 +789,40 @@ class _PaymentCheckboxState extends State<PaymentCheckbox> {
                         if (isPaid) {
                           paidCount++;
                           totalLent += paymentAmount;
+                          // Add the totalAmount to the sumTotalAmount value
+                          sumTotalLent -= paymentAmount;
+                          //
+                          final sumTotalDebt = await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(payment['id'])
+                              .get()
+                              .then(
+                                  (value) => value['sumTotalDebt'].toDouble());
+
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(payment['id'])
+                              .update({
+                            'sumTotalDebt': sumTotalDebt - paymentAmount,
+                          });
                         } else if (paidCount > 0) {
                           paidCount--;
                           totalLent -= paymentAmount;
+                          // Add the totalAmount to the sumTotalLent value
+                          sumTotalLent += paymentAmount;
+                          final sumTotalDebt = await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(payment['id'])
+                              .get()
+                              .then(
+                                  (value) => value['sumTotalDebt'].toDouble());
+
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(payment['id'])
+                              .update({
+                            'sumTotalDebt': sumTotalDebt + paymentAmount,
+                          });
                         }
                         break;
                       }
@@ -756,6 +834,16 @@ class _PaymentCheckboxState extends State<PaymentCheckbox> {
                         'totalLent': totalLent,
                       },
                     );
+                    //get user iD
+
+                    // Update the sumTotalLent field in the user document
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(widget.ownerId)
+                        .update({
+                      'sumTotalLent': sumTotalLent.toDouble(),
+                      // 'sumTotalDept': sumTotalDept.toDouble(),
+                    });
                   }
                 },
               );
