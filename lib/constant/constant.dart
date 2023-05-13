@@ -1,5 +1,48 @@
 import 'package:flutter/material.dart';
 
+final theme = ThemeData(
+  textTheme: const TextTheme(
+    headlineLarge: TextStyle(
+      color: kSecondaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontWeight: FontWeight.w700,
+    ),
+    headlineMedium: TextStyle(
+      color: kSecondaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontWeight: FontWeight.w600,
+    ),
+    headlineSmall: TextStyle(
+      color: kSecondaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontWeight: FontWeight.w400,
+    ),
+
+    //Fixed font size
+    bodyLarge: TextStyle(
+      color: kPrimaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontSize: 25,
+      fontWeight: FontWeight.bold,
+    ),
+    bodyMedium: TextStyle(
+      color: kPrimaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontSize: 19,
+    ),
+    labelMedium: TextStyle(
+      color: kPrimaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+    ),
+    bodySmall: TextStyle(
+      color: kPrimaryColor,
+      fontFamily: 'SFTHONBURI',
+      fontSize: 13,
+    ),
+  ),
+);
 const kPrimaryColor = Color(0xFF232248);
 const kSecondaryColor = Color(0xFFFFFFFF);
 const kButtonColor = Color(0xFFF517CF0);

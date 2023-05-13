@@ -1,12 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cool_alert/cool_alert.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/login/widgets/button.dart';
+import 'package:haan_r_haan/src/viewmodels/auth_view_model.dart';
 import 'package:haan_r_haan/src/widgets/input_box.dart';
-
 import '../../../constant/constant.dart';
+import '../../widgets/button.dart';
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
@@ -16,89 +13,36 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  //login and sign up
+  //login
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _errorLoginMessage = "";
 
   //sign up
   final _newEmailController = TextEditingController();
   final _newPasswordController = TextEditingController();
-  final _usernameController = TextEditingController();
-  final _phoneNumberController = TextEditingController();
-  String _errorSignUpMessage = "";
+  final _newUsernameController = TextEditingController();
+  final _newPhoneNumberController = TextEditingController();
 
   final double bottomSheetPadding = 40;
-  Future<void> logIn() async {
-    //Show loading
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+
+  Future<void> logIn(context) async {
+    final authViewModel = AuthViewModel();
+    await authViewModel.logIn(
+      _emailController.text,
+      _passwordController.text,
+      context,
     );
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text, password: _passwordController.text);
-      Navigator.pop(context);
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      final errorMessage = "* ${e.message}";
-      print(e.code);
-      Navigator.pop(context);
-      setState(() {
-        _errorLoginMessage = errorMessage;
-      });
-      CoolAlert.show(
-        backgroundColor: redPastelColor,
-        context: context,
-        type: CoolAlertType.error,
-        text: _errorLoginMessage,
-      );
-    }
   }
 
-  signUp() async {
-    //Show loading
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+  Future<void> signUp(context) async {
+    final authViewModel = AuthViewModel();
+    await authViewModel.signUp(
+      _newEmailController.text,
+      _newPasswordController.text,
+      _newUsernameController.text,
+      _newPhoneNumberController.text,
+      context,
     );
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _newEmailController.text,
-        password: _newPasswordController.text,
-      );
-      addUserDetails();
-      Navigator.pop(context);
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _errorSignUpMessage = "* ${e.message}";
-      });
-      print(e.code);
-      Navigator.pop(context);
-      CoolAlert.show(
-        backgroundColor: redPastelColor,
-        context: context,
-        type: CoolAlertType.error,
-        text: _errorSignUpMessage,
-      );
-    }
-  }
-
-  addUserDetails() async {
-    await FirebaseFirestore.instance.collection("users").add({
-      "username": _usernameController.text,
-      "email": _emailController.text,
-      "phoneNumber": _phoneNumberController.text,
-    });
   }
 
   @override
@@ -109,24 +53,17 @@ class _StartPageState extends State<StartPage> {
         decoration: const BoxDecoration(
           gradient: kDefaultBG,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(kDefaultPadding),
-          child: Center(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(50),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenWidth = constraints.maxWidth;
-                    final double logoHeight =
-                        screenWidth > 500 ? 240 : screenWidth * 0.48;
-                    return Image.asset(
-                      "assets/images/logo.png",
-                      height: logoHeight,
-                    );
-                  },
+                Image.asset(
+                  "assets/images/logo.png",
+                  height: 240,
                 ),
                 const SizedBox(height: 20),
                 Image.asset(
@@ -134,27 +71,21 @@ class _StartPageState extends State<StartPage> {
                   height: 80,
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
+                const SizedBox(
                   width: 300,
                   child: Text(
-                      "Split expenses with ease! \n Our app simplifies cost calculation \n for shared items among friends.",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: kSecondaryColor)),
+                    "Split expenses with ease! \n Our app simplifies cost calculation \n for shared items among friends.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFFCCCCCC),
+                      fontSize: 15,
+                    ),
+                  ),
                 ),
                 const Spacer(),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenWidth = constraints.maxWidth;
-                    final double buttonWidth =
-                        screenWidth > 500 ? 500 : screenWidth;
-                    return SizedBox(
-                      width: buttonWidth,
-                      child: _buildButton(context),
-                    );
-                  },
+                _buildButtons(context),
+                const SizedBox(
+                  height: 30,
                 ),
               ],
             ),
@@ -164,15 +95,13 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  Padding _buildButton(BuildContext context) {
+  Padding _buildButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(
         children: [
           Button(
-            () {
-              _login();
-            },
+            () => _login(),
             "Login",
             isOutlined: true,
           ),
@@ -183,6 +112,7 @@ class _StartPageState extends State<StartPage> {
             children: [
               Expanded(
                 child: Container(
+                  height: 0.3,
                   color: const Color(0xFFCCCCCC),
                 ),
               ),
@@ -200,6 +130,7 @@ class _StartPageState extends State<StartPage> {
               ),
               Expanded(
                 child: Container(
+                  height: 0.3,
                   color: const Color(0xFFCCCCCC),
                 ),
               ),
@@ -260,14 +191,6 @@ class _StartPageState extends State<StartPage> {
                   ),
                 ],
               ),
-              // const Text(
-              //   "Login",
-              //   style: TextStyle(
-              //     color: kPrimaryColor,
-              //     fontSize: 32,
-              //     fontWeight: FontWeight.bold,
-              //   ),
-              // ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.05,
               ),
@@ -298,7 +221,7 @@ class _StartPageState extends State<StartPage> {
               ),
               const Spacer(),
               Button(
-                logIn,
+                () => logIn(context),
                 "Login",
               ),
               const SizedBox(
@@ -356,19 +279,11 @@ class _StartPageState extends State<StartPage> {
                     ),
                   ],
                 ),
-                // const Text(
-                //   "Sign Up",
-                //   style: TextStyle(
-                //     color: kPrimaryColor,
-                //     fontSize: 32,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.05,
                 ),
                 InputBox(
-                  controller: _usernameController,
+                  controller: _newUsernameController,
                   errorText: "",
                   label: "Username",
                   isShadow: true,
@@ -390,17 +305,14 @@ class _StartPageState extends State<StartPage> {
                   isLight: true,
                 ),
                 InputBox(
-                  controller: _phoneNumberController,
+                  controller: _newPhoneNumberController,
                   errorText: "",
                   label: "Phone number (optional)",
                   isShadow: true,
                   isLight: true,
                 ),
                 const Spacer(),
-                Button(
-                  signUp,
-                  "Sign up",
-                ),
+                Button(() => signUp(context), "Sign up"),
                 const SizedBox(
                   height: 40,
                 ),
