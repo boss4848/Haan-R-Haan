@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/viewmodels/auth_view_model.dart';
 import 'package:haan_r_haan/src/widgets/input_box.dart';
+import 'package:provider/provider.dart';
 import '../../../constant/constant.dart';
 import '../../widgets/button.dart';
 
@@ -26,7 +27,7 @@ class _StartPageState extends State<StartPage> {
   final double bottomSheetPadding = 40;
 
   Future<void> logIn(context) async {
-    final authViewModel = AuthViewModel();
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     await authViewModel.logIn(
       _emailController.text,
       _passwordController.text,
@@ -35,7 +36,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   Future<void> signUp(context) async {
-    final authViewModel = AuthViewModel();
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     await authViewModel.signUp(
       _newEmailController.text,
       _newPasswordController.text,

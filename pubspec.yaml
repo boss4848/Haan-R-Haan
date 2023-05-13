@@ -7,6 +7,7 @@ environment:
   sdk: '>=2.19.3 <3.0.0'
 
 dependencies:
+  animated_text_kit: ^4.2.2
   cloud_firestore: ^4.5.2
   cool_alert: ^2.0.1
   cupertino_icons: ^1.0.5
@@ -20,6 +21,8 @@ dependencies:
   provider: ^6.0.5
   qr_code_scanner: ^1.0.1
   qr_flutter: ^4.0.0
+  skeleton_animation: ^0.1.4
+  timeago: ^3.3.0
 
 dev_dependencies:
   flutter_test:

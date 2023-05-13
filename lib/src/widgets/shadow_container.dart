@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import '../../constant/constant.dart';
 
 class ShadowContainer extends StatelessWidget {
-  final Widget element;
-  final int length;
+  final List<Widget> list;
   final bool showMoreIcon;
 
   const ShadowContainer({
-    required this.length,
-    required this.element,
+    required this.list,
     this.showMoreIcon = true,
     super.key,
   });
@@ -26,19 +24,7 @@ class ShadowContainer extends StatelessWidget {
         bottom: 10,
       ),
       decoration: boxShadow_1,
-      child: Column(
-        children: [
-          // loop through the list of widgets
-          if (length > 0)
-            for (var i = 0; i < length; i++) element,
-          // show more icon
-          if (showMoreIcon)
-            const Icon(
-              Icons.more_horiz,
-              color: kPrimaryColor,
-            ),
-        ],
-      ),
+      child: Column(children: list),
     );
   }
 }

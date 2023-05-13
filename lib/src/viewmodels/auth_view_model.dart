@@ -3,7 +3,7 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../widgets/loading.dart';
+import '../widgets/loading_dialog.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -22,7 +22,7 @@ class AuthViewModel extends ChangeNotifier {
     String password,
     context,
   ) async {
-    loading(context);
+    loadingDialog(context);
     try {
       await _authService.signIn(
         email: email,
@@ -48,7 +48,7 @@ class AuthViewModel extends ChangeNotifier {
     String phoneNumber,
     context,
   ) async {
-    loading(context);
+    loadingDialog(context);
     try {
       bool usernameTaken = await isUsernameTaken(username);
       if (usernameTaken) {
