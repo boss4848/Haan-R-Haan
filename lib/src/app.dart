@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'pages/auth/auth_page.dart';
 import 'viewmodels/friend_view_model.dart';
+import 'viewmodels/party_view_model.dart';
 import 'viewmodels/user_view_model.dart';
 
 class MainApp extends StatelessWidget {
@@ -17,6 +18,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => FriendViewModel()),
+        ChangeNotifierProvider(create: (_) => PartyViewModel()),
       ],
       child: MaterialApp(
         theme: theme,

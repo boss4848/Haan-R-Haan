@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../constant/constant.dart';
+import '../../../viewmodels/user_view_model.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});
@@ -29,22 +31,28 @@ class CustomAppBar extends StatelessWidget {
               height: appBarSize,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: boxShadow_1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatus(
-                    image: "assets/images/dept.png",
-                    amount: 1100,
-                    title: "TOTAL DEPT",
-                  ),
-                  const VerticalDivider(thickness: 1),
-                  _buildStatus(
-                    image: "assets/images/bitcoin.png",
-                    amount: 1000,
-                    title: "TOTAL LENT",
-                  ),
-                ],
-              ),
+              child: Consumer<UserViewModel>(builder: (
+                context,
+                userViewModel,
+                child,
+              ) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatus(
+                      image: "assets/images/dept.png",
+                      amount: userViewModel.user.userTotalDebt,
+                      title: "TOTAL DEPT",
+                    ),
+                    const VerticalDivider(thickness: 1),
+                    _buildStatus(
+                      image: "assets/images/bitcoin.png",
+                      amount: userViewModel.user.userTotalLent,
+                      title: "TOTAL LENT",
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
         ],
@@ -53,7 +61,7 @@ class CustomAppBar extends StatelessWidget {
   }
 
   Column _buildStatus(
-      {required String title, required String image, int amount = 0}) {
+      {required String title, required String image, double amount = 0}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +71,7 @@ class CustomAppBar extends StatelessWidget {
             Image.asset(image),
             const SizedBox(width: 10),
             Text(
-              "$amount ฿",
+              "${amount.toStringAsFixed(0)} ฿",
               style: const TextStyle(
                 color: kPrimaryColor,
                 fontSize: 18,

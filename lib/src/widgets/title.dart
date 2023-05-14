@@ -45,7 +45,7 @@ class TitleBar extends StatelessWidget {
             Text(
               lastChild!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    decoration: TextDecoration.underline,
+                  // decoration: TextDecoration.underline,
                   ),
             ),
         ],

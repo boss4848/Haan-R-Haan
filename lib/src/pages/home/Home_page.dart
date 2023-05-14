@@ -1,20 +1,14 @@
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/main/main_page.dart';
-import 'package:haan_r_haan/src/widgets/show_more.dart';
-import '../bill_detail/member_bill_detail/bill_member_page.dart';
-import '../bill_detail/owner_bill_detail/bill_owner_page.dart';
-
+import 'package:haan_r_haan/src/widgets/shadow_container.dart';
 import '../../../constant/constant.dart';
-import '../notification/notification_page.dart';
+import '../../models/party_model.dart';
+import '../../models/user_model.dart';
+import '../../viewmodels/party_view_model.dart';
+import '../../viewmodels/user_view_model.dart';
 import './widget/custom_appbar.dart';
 import '../../widgets/title.dart';
-import '../../widgets/shadow_container.dart';
+import 'widget/party_item.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,32 +18,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String addNewLineAfterSixWords(String phrase) {
-    final List<String> words = phrase.split(' ');
-    final int numWords = words.length;
-
-    if (numWords <= 6) {
-      return phrase; // return the original phrase if it has 6 or fewer words
-    }
-
-    String newPhrase = ''; // initialize the new phrase string
-
-    for (int i = 0; i < numWords; i += 6) {
-      final int end = (i + 6 < numWords) ? i + 6 : numWords;
-      final String line =
-          words.sublist(i, end).join(' '); // get 6 words at a time
-      newPhrase +=
-          '$line\n'; // add the line to the new phrase with a newline character
-    }
-
-    return newPhrase.trim(); // remove any trailing whitespace
-  }
+  final partyViewModel = PartyViewModel();
+  final userViewModel = UserViewModel();
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 400;
-
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -61,51 +34,64 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 10),
-          const TitleBar(
-            title: "Party List",
-            subTitle: "as owner - ${1} parties",
+          StreamBuilder(
+            stream: partyViewModel.fetchPartiesAsOwner(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final List<PartyModel> parties = snapshot.data!;
+              return Column(
+                children: [
+                  TitleBar(
+                    title: "Party List",
+                    subTitle: "as owner",
+                    lastChild: "${parties.length} parties",
+                  ),
+                  ShadowContainer(
+                    partiesCount: parties.length,
+                    list: List.generate(
+                      parties.length,
+                      (index) => PartyItem(
+                        party: parties[index],
+                        isOwner: true,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          ShadowContainer(
-            element: _buildPartyItem(
-              partyName: "Party name",
-              date: "Tue 18 Apr 22:26",
-              subTitle: " 6 ",
-              detail: "Total 600 baht",
-              price: -500,
-              navigator: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OwnerBillDetailPage(),
-                    ));
-              },
-            ),
-            length: 3,
+          StreamBuilder(
+            stream: partyViewModel.fetchPartiesAsMember(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              print(snapshot.data);
+              final List<PartyModel> parties = snapshot.data!;
+
+              return Column(
+                children: [
+                  TitleBar(
+                    title: "Party List",
+                    subTitle: "as member",
+                    lastChild: "${parties.length} parties",
+                  ),
+                  ShadowContainer(
+                    partiesCount: parties.length,
+                    list: List.generate(
+                      parties.length,
+                      (index) => PartyItem(
+                        party: parties[index],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          const ShowMore(),
-          const TitleBar(
-            title: "Party List",
-            subTitle: "as member - ${1} parties",
-            lastChild: "order by price",
-          ),
-          ShadowContainer(
-            element: _buildPartyItemMember(
-              partyName: "Party name",
-              date: "Tue 18 Apr 22:26",
-              subTitle: "PatthadolRaks",
-              detail: "Debt",
-              price: 1300,
-              navigator: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MemberBillDetail(),
-                    ));
-              },
-            ),
-            length: 3,
-          ),
-          const ShowMore(),
           const SizedBox(height: 30),
         ],
       ),
@@ -139,47 +125,49 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: FutureBuilder(
-                        //get username from firestore
-                        future: FirebaseFirestore.instance
-                            .collection('users')
-                            .where('email',
-                                isEqualTo:
-                                    FirebaseAuth.instance.currentUser!.email)
-                            .get(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Text("Loading...");
-                          }
-                          final greetingPhrases = [
-                            "Grab a bite, ${userData["username"]}?",
-                            "Chow down, ${userData["username"]}?",
-                            "Join me, ${userData["username"]}?",
-                            "Share a table, ${userData["username"]}?",
-                            "Let's break bread, ${userData["username"]}?",
-                            "Dine with me, ${userData["username"]}?",
-                            "Food's better shared, ${userData["username"]}.",
-                            "Feast together, my treat, \n ${userData["username"]}?",
-                            "Good food and company, \n ${userData["username"]}?",
-                          ];
-                          return Text(
-                            greetingPhrases[
-                                Random().nextInt(greetingPhrases.length)],
-                            style: const TextStyle(
-                                fontSize: 16, color: kSecondaryColor),
-                            maxLines: 2,
+                      future: userViewModel.fetchUser(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
-                        }),
+                        }
+                        UserModel user = snapshot.data as UserModel;
+                        final greetingPhrases = [
+                          "Grab a bite, ${user.username}?",
+                          "Chow down, ${user.username}?",
+                          "Join me, ${user.username}?",
+                          "Share a table, ${user.username}?",
+                          "Let's break bread, ${user.username}?",
+                          "Dine with me, ${user.username}?",
+                          "Food's better shared, ${user.username}.",
+                          "Feast together, my treat, ${user.username}?",
+                          "Good food and company, ${user.username}?",
+                        ];
+                        const textStyle = TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        );
+                        return AnimatedTextKit(
+                          animatedTexts: List.generate(
+                            greetingPhrases.length,
+                            (index) => TypewriterAnimatedText(
+                              greetingPhrases[index],
+                              textStyle: textStyle,
+                              curve: Curves.bounceIn,
+                              speed: const Duration(milliseconds: 200),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
               IconButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NotificationPage(),
-                      ));
+                  print("clicked");
                 },
                 icon: const Icon(
                   Icons.notifications,
@@ -190,227 +178,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Padding _buildPartyItem({
-    required String partyName,
-    required String date,
-    required String subTitle,
-    required String detail,
-    required int price,
-    required Function navigator,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    partyName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 3),
-                  const Text(
-                    '·',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 3),
-                  const Icon(
-                    CupertinoIcons.person_2_fill,
-                    size: 16,
-                    color: kPrimaryColor,
-                  ),
-                  Text(
-                    // "· 6 members",
-                    subTitle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 3),
-              Text(
-                date,
-                style: const TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 7,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: redPastelColor,
-                    ),
-                    child: Text(
-                      "$price baht",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    detail,
-                    style: const TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 6),
-              GestureDetector(
-                onTap: () => navigator(),
-                child: const Icon(
-                  CupertinoIcons.back,
-                  textDirection: TextDirection.rtl,
-                  color: kPrimaryColor,
-                  size: 20,
-                ),
-              )
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Padding _buildPartyItemMember({
-    required String partyName,
-    required String date,
-    required String subTitle,
-    required String detail,
-    required int price,
-    required Function navigator,
-  }) {
-    final abbreviatedSubTitle =
-        subTitle.length > 5 ? '${subTitle.substring(0, 5)}...' : subTitle;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    partyName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 3),
-                  const Text(
-                    '·',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    abbreviatedSubTitle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: kPrimaryColor,
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 3),
-              Text(
-                date,
-                style: const TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 7,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: redPastelColor,
-                    ),
-                    child: Text(
-                      "$price baht",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    detail,
-                    style: const TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 6),
-              GestureDetector(
-                onTap: () => navigator(),
-                child: const Icon(
-                  CupertinoIcons.back,
-                  textDirection: TextDirection.rtl,
-                  color: kPrimaryColor,
-                  size: 20,
-                ),
-              )
-            ],
-          )
-        ],
       ),
     );
   }
