@@ -6,17 +6,20 @@ class PartyModel {
   final String partyID;
   final String partyName;
   final String partyDesc;
-  final List<FoodModel> foodList;
   final Timestamp createdAt;
   final Timestamp updatedAt;
   final double totalAmount;
   final double totalLent;
-  final List<PaymentModel> paymentList;
+  // final List<FoodModel> foodList;
+  // final List<PaymentModel> paymentList;
+  final List<Map<String, dynamic>> foodList;
+  final List<Map<String, dynamic>> paymentList;
   final int paidCount;
   final bool isDraft;
   final List<String> members;
   final String ownerID;
   final String ownerName;
+  final String promptpay;
 
   PartyModel({
     required this.partyID,
@@ -33,55 +36,63 @@ class PartyModel {
     required this.members,
     required this.ownerID,
     required this.ownerName,
+    required this.promptpay,
   });
   factory PartyModel.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> json = doc.data() as Map<String, dynamic>;
-    List<FoodModel> foodItems = [];
-    if (json['foodList'] != null) {
-      for (var item in json['foodList']) {
-        foodItems.add(FoodModel.fromFirestore(item));
-      }
-    }
-    List<PaymentModel> paymentItems = [];
-    if (json['paymentList'] != null) {
-      for (var item in json['paymentList']) {
-        paymentItems.add(PaymentModel.fromFirestore(item));
-      }
-    }
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    // print("foodList: ${data['foodList']}");
+    // print("paymentList: ${data['paymentList']}");
     return PartyModel(
-      partyID: json['partyID'] ?? '',
-      partyName: json['partyName'] ?? '',
-      partyDesc: json['partyDesc'] ?? '',
-      foodList: foodItems,
-      createdAt: json['createdAt'] ?? '',
-      updatedAt: json['updatedAt'] ?? '',
-      totalAmount: json['totalAmount']?.toDouble() ?? 0.0,
-      totalLent: json['totalLent']?.toDouble() ?? 0.0,
-      paymentList: paymentItems,
-      paidCount: json['paidCount'] ?? 0,
-      isDraft: json['isDraft'] ?? false,
-      members: List<String>.from(json['members'] ?? []),
-      ownerID: json['ownerID'] ?? '',
-      ownerName: json['ownerName'] ?? '',
+      partyID: data['partyID'] ?? '',
+      partyName: data['partyName'] ?? '',
+      partyDesc: data['partyDesc'] ?? '',
+      ownerID: data['ownerID'] ?? '',
+      promptpay: data['promptpay'] ?? '',
+      ownerName: data['ownerName'] ?? '',
+      createdAt: data['createdAt'] ?? Timestamp.now(),
+      updatedAt: data['updatedAt'] ?? Timestamp.now(),
+      members: List<String>.from(data['members']),
+      totalAmount: data['totalAmount'].toDouble() ?? 0.0,
+      totalLent: data['totalLent'].toDouble() ?? 0.0,
+      isDraft: data['isDraft'] ?? true,
+      paidCount: data['paidCount'] ?? 0,
+      // foodList: [],
+      // paymentList: [],
+      foodList: List<Map<String, dynamic>>.from(data['foodList']),
+      paymentList: List<Map<String, dynamic>>.from(data['paymentList']),
+      // foodList: List<FoodModel>.from(
+      //   data['foodList']
+      //           .map((item) => FoodModel.fromFirestore(item))
+      //           .toList() ??
+      //       [],
+      // ),
+      // paymentList: List<PaymentModel>.from(
+      //   data['paymentList']
+      //           .map((item) => PaymentModel.fromFirestore(item))
+      //           .toList() ??
+      //       [],
+      // ),
     );
   }
-
   Map<String, dynamic> toFirestore() {
     return {
       'partyID': partyID,
       'partyName': partyName,
       'partyDesc': partyDesc,
-      'foodList': foodList.map((item) => item.toFirestore()).toList(),
+      'foodList': foodList,
+      // 'foodList': foodList.map((item) => item.toFirestore()).toList(),
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'totalAmount': totalAmount,
       'totalLent': totalLent,
-      'paymentList': paymentList.map((item) => item.toFirestore()).toList(),
+      'paymentList': paymentList,
+      // 'paymentList': paymentList.map((item) => item.toFirestore()).toList(),
       'paidCount': paidCount,
       'isDraft': isDraft,
       'members': members,
       'ownerID': ownerID,
       'ownerName': ownerName,
+      'promptpay': promptpay,
     };
   }
 }

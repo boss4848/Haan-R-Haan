@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
-import 'package:haan_r_haan/src/pages/login/widgets/button.dart';
 import 'package:haan_r_haan/src/widgets/input_box.dart';
-
-import '../select_member/select_member_page.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/party_view_model.dart';
+import '../../widgets/button.dart';
 
 class CreatePartyPage extends StatefulWidget {
   const CreatePartyPage({super.key});
@@ -101,15 +101,18 @@ class _CreatePartyPageState extends State<CreatePartyPage> {
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Button(() {
-                  Navigator.push(
+                child: Button(() async {
+                  final partyViewModel = Provider.of<PartyViewModel>(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const SelectMemberPage();
-                      },
-                    ),
+                    listen: false,
                   );
+                  final createData = await partyViewModel.createParty(
+                    partyName: partyNameController.text,
+                    partyDesc: descriptionController.text,
+                    promptpay: phoneNumberController.text,
+                    context: context,
+                  );
+                  Navigator.pop(context);
                 }, "Create"),
               )
             ],

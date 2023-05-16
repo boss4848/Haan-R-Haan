@@ -34,12 +34,70 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 10),
+          // StreamBuilder(
+          //   builder: (context, snapshot) {
+          //     if (snapshot.connectionState == ConnectionState.waiting) {
+          //       return const Center(child: CircularProgressIndicator());
+          //     }
+          //     return Container(
+          //       child: Text('Empty data'),
+          //     );
+          //   },
+          // ),
           StreamBuilder(
             stream: partyViewModel.fetchPartiesAsOwner(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
+              if (snapshot.hasError) {
+                print("error: ${snapshot.error}");
+              }
+              if (snapshot.data!.isEmpty) {
+                return Column(
+                  children: [
+                    const TitleBar(
+                      title: "Party List",
+                      subTitle: "as owner",
+                      lastChild: "0 parties",
+                    ),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: boxShadow_1,
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 110,
+                            width: 15,
+                            decoration: const BoxDecoration(
+                              color: greenPastelColor,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                              ),
+                            ),
+                          ),
+                          const Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Text(
+                                "You haven't created any parties yet. To split bills with friends, start by creating a party.",
+                                softWrap: true,
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                );
+              }
+
               final List<PartyModel> parties = snapshot.data!;
               return Column(
                 children: [
@@ -68,7 +126,50 @@ class _HomePageState extends State<HomePage> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-
+              if (snapshot.data!.isEmpty) {
+                return Column(
+                  children: [
+                    const TitleBar(
+                      title: "Party List",
+                      subTitle: "as member",
+                      lastChild: "0 parties",
+                    ),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: boxShadow_1,
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 110,
+                            width: 15,
+                            decoration: const BoxDecoration(
+                              color: redPastelColor,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                              ),
+                            ),
+                          ),
+                          const Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Text(
+                                "You're not a member of any parties yet. Join a party to start splitting bills with friends.",
+                                softWrap: true,
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                );
+              }
               print(snapshot.data);
               final List<PartyModel> parties = snapshot.data!;
 

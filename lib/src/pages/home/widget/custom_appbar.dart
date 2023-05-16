@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constant/constant.dart';
+import '../../../models/user_model.dart';
 import '../../../viewmodels/user_view_model.dart';
 
 class CustomAppBar extends StatelessWidget {
@@ -36,22 +39,42 @@ class CustomAppBar extends StatelessWidget {
                 userViewModel,
                 child,
               ) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatus(
-                      image: "assets/images/dept.png",
-                      amount: userViewModel.user.userTotalDebt,
-                      title: "TOTAL DEPT",
-                    ),
-                    const VerticalDivider(thickness: 1),
-                    _buildStatus(
-                      image: "assets/images/bitcoin.png",
-                      amount: userViewModel.user.userTotalLent,
-                      title: "TOTAL LENT",
-                    ),
-                  ],
-                );
+                return StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .where(
+                          'uid',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                        )
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      DocumentSnapshot documentSnapshot =
+                          snapshot.data!.docs[0];
+                      final UserModel user = UserModel.fromFirestore(
+                        documentSnapshot,
+                      );
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatus(
+                            image: "assets/images/dept.png",
+                            amount: user.userTotalDebt,
+                            title: "TOTAL DEPT",
+                          ),
+                          const VerticalDivider(thickness: 1),
+                          _buildStatus(
+                            image: "assets/images/bitcoin.png",
+                            amount: user.userTotalLent,
+                            title: "TOTAL LENT",
+                          ),
+                        ],
+                      );
+                    });
               }),
             ),
           ),

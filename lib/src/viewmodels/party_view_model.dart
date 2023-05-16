@@ -58,6 +58,7 @@ class PartyViewModel with ChangeNotifier {
     if (promptpay == "") {
       promptpay = userData.phoneNumber;
     }
+    print("promptpay: $promptpay");
     final craeteParty = await _firestore
         .collection('parties')
         .add(
@@ -76,15 +77,16 @@ class PartyViewModel with ChangeNotifier {
             members: [userData.uid],
             ownerID: userData.uid,
             ownerName: userData.username,
+            promptpay: promptpay,
           ).toFirestore(),
         )
         .then((value) => value.update({
               'partyID': value.id,
             }));
     //Update partiesAsOwnerCount to user
-    await _firestore.collection('users').doc(userData.uid).update({
-      'partiesAsOwnerCount': userData.partiesAsOwnerCount + 1,
-    });
+    // await _firestore.collection('users').doc(userData.uid).update({
+    //   'partiesAsOwnerCount': userData.partiesAsOwnerCount + 1,
+    // });
 
     Navigator.pop(context);
     notifyListeners();
