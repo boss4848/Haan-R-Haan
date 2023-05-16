@@ -1,9 +1,11 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/viewmodels/auth_view_model.dart';
 import 'package:haan_r_haan/src/widgets/input_box.dart';
 import 'package:provider/provider.dart';
 import '../../../constant/constant.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/button.dart';
 
 class StartPage extends StatefulWidget {
@@ -210,14 +212,37 @@ class _StartPageState extends State<StartPage> {
                 isLight: true,
                 obscureText: true,
               ),
-              const Align(
+              Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  "Forgot password",
-                  style: TextStyle(
-                      color: greyBackgroundColor,
-                      fontSize: 16,
-                      decoration: TextDecoration.underline),
+                child: GestureDetector(
+                  onTap: () async {
+                    if (_emailController.text != "") {
+                      await AuthService()
+                          .changePassword(_emailController.text)
+                          .then((value) {
+                        CoolAlert.show(
+                          context: context,
+                          type: CoolAlertType.success,
+                          title: "Please check your email for password reset",
+                          confirmBtnText: "Ok",
+                        );
+                      });
+                    } else {
+                      CoolAlert.show(
+                        context: context,
+                        type: CoolAlertType.error,
+                        title: "Please enter your email for password reset",
+                        confirmBtnText: "Ok",
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "Forgot password",
+                    style: TextStyle(
+                        color: greyBackgroundColor,
+                        fontSize: 16,
+                        decoration: TextDecoration.underline),
+                  ),
                 ),
               ),
               const Spacer(),

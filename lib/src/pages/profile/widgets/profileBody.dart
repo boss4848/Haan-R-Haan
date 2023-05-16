@@ -1,3 +1,4 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
 import 'package:haan_r_haan/src/pages/profile/widgets/paid_party.dart';
@@ -59,7 +60,16 @@ class profileBody extends StatelessWidget {
                         ),
                         side: const BorderSide(color: kPrimaryColor),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await AuthService().changePassword("").then((value) {
+                          CoolAlert.show(
+                            context: context,
+                            type: CoolAlertType.success,
+                            title: "Please check your email",
+                            confirmBtnText: "Ok",
+                          );
+                        });
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: kDefaultPadding / 2),

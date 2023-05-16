@@ -24,6 +24,12 @@ class AuthService {
     }
   }
 
+  Future<void> changePassword(String? email) async {
+    await _auth.sendPasswordResetEmail(
+      email: email == "" ? _auth.currentUser!.email! : email!,
+    );
+  }
+
   Future<User?> signUp({
     required String email,
     required String password,
