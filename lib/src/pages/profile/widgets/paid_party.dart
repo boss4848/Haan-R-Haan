@@ -1,12 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/pages/bill_detail/member_bill_detail/bill_member_page.dart';
+import 'package:haan_r_haan/src/pages/detail/bill_detail_page.dart';
+import 'package:haan_r_haan/src/utils/format.dart';
 
 import '../../../../constant/constant.dart';
+import '../../../models/party_model.dart';
+import '../../../viewmodels/party_view_model.dart';
 import '../../../widgets/shadow_container.dart';
-import '../../../widgets/show_more.dart';
 import '../../../widgets/title.dart';
-import '../../bill_detail/owner_bill_detail/bill_owner_page.dart';
+import '../../home/widget/party_item.dart';
 
 class PaidPartyList extends StatelessWidget {
   final String name;
@@ -104,28 +109,114 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
     return Column(
       children: [
         const SizedBox(height: 10),
-        const TitleBar(
-          title: "Your History",
-          subTitle: "${10} parties",
+        StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('parties')
+              .where('members',
+                  arrayContains: FirebaseAuth.instance.currentUser!.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              print("error: ${snapshot.error}");
+            }
+            if (snapshot.data == null) {
+              return Column(
+                children: [
+                  const TitleBar(
+                    title: "Your history",
+                    subTitle: "",
+                    lastChild: "0 parties",
+                  ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: boxShadow_1,
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 110,
+                          width: 15,
+                          decoration: const BoxDecoration(
+                            color: greenPastelColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              bottomLeft: Radius.circular(10),
+                            ),
+                          ),
+                        ),
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Text(
+                              "You don't have any history yet.",
+                              softWrap: true,
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              );
+            }
+            //loop party to list
+            final List<PartyModel> parties = [];
+            for (var i = 0; i < snapshot.data!.docs.length; i++) {
+              final party = snapshot.data!.docs[i];
+              final partyModel = PartyModel.fromFirestore(party);
+              parties.add(partyModel);
+            }
+
+            return Column(
+              children: [
+                TitleBar(
+                  title: "Your history",
+                  subTitle: "",
+                  lastChild: "${parties.length} parties",
+                ),
+                ShadowContainer(
+                  partiesCount: parties.length,
+                  list: List.generate(
+                      parties.length,
+                      (index) => _buildHistoryPartyItem(
+                            partyName: parties[index].partyName,
+                            date: formatDateTime(
+                                parties[index].createdAt.toDate()),
+                            subTitle: parties[index].ownerName,
+                            detail: parties[index].partyDesc,
+                            status: parties[index].paymentList.any((e) {
+                              return e['id'] ==
+                                      FirebaseAuth.instance.currentUser!.uid &&
+                                  e['isPaid'] == true;
+                            }),
+                            navigator: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BillDetailPage(
+                                    party: parties[index],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                      // (index) => PartyItem(
+                      //   party: parties[index],
+                      //   // isOwner: true,
+                      // ),
+                      ),
+                ),
+              ],
+            );
+          },
         ),
-        ShadowContainer(
-          element: _buildHistoryPartyItem(
-            partyName: "Party name",
-            date: "Tue 18 Apr 22:26",
-            subTitle: "6",
-            detail: "Total 600 baht",
-            status: isBillpaid,
-            navigator: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MemberBillDetail(),
-                  ));
-            },
-          ),
-          length: 3,
-        ),
-        const ShowMore(),
       ],
     );
   }

@@ -1,16 +1,20 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
 import 'package:haan_r_haan/src/pages/profile/widgets/paid_party.dart';
 import 'package:haan_r_haan/src/pages/profile/widgets/user_info.dart';
+import 'package:provider/provider.dart';
+
+import '../../../services/auth_service.dart';
+import '../../../viewmodels/auth_view_model.dart';
+import '../../../viewmodels/user_view_model.dart';
 
 // ignore: camel_case_types
 class profileBody extends StatelessWidget {
   const profileBody({super.key});
 
-  signOut() async {
-    await FirebaseAuth.instance.signOut();
-  }
+  // signOut() async {
+  //   await FirebaseAuth.instance.signOut();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +81,16 @@ class profileBody extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         shadowColor: Colors.black38),
-                    onPressed: signOut,
+                    onPressed: () {
+                      Provider.of<UserViewModel>(
+                        context,
+                        listen: false,
+                      ).clearUserData();
+                      Provider.of<AuthViewModel>(
+                        context,
+                        listen: false,
+                      ).signOut();
+                    },
                     child: const Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: kDefaultPadding / 2),

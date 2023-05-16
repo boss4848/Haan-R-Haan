@@ -1,12 +1,16 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:haan_r_haan/constant/constant.dart';
 import 'package:flutter/services.dart';
+import 'package:haan_r_haan/src/widgets/loading_dialog.dart';
 
+import '../../../models/user_model.dart';
 import '../../main/main_page.dart';
 
 class UserInfoWidget extends StatefulWidget {
@@ -20,11 +24,13 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
   // String _username = "Yo";
   // String _email = "yo@gmail.com";
   // String _phoneNo = "0956786848";
-  String _username = userData["username"];
-  final String _email = userData["email"];
-  String _phoneNo = userData["phoneNumber"];
+  // String _username = userData["username"];
+  // final String _email = userData["email"];
+  // String _phoneNo = userData["phoneNumber"];
 
-  void _editUserInfo() async {
+  void _editUserInfo(UserModel user) async {
+    bool errorUsername = false;
+    bool errorPhoneNo = false;
     final updatedUserInfo = await showModalBottomSheet<Map<String, String>>(
       backgroundColor: Colors.transparent,
       context: context,
@@ -33,12 +39,13 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (BuildContext context) {
-        final usernameController = TextEditingController(text: _username);
-        final phoneNoController = TextEditingController(text: _phoneNo);
+        final usernameController = TextEditingController(text: user.username);
+        final phoneNoController = TextEditingController(text: user.phoneNumber);
 
         return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 8.0),
             child: Container(
@@ -58,7 +65,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                           color: Colors.black26,
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: kDefaultPadding / 2,
                     ),
                     Column(
@@ -69,7 +76,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                           color: kPrimaryColor,
                           width: 40,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: kDefaultPadding / 4,
                         ),
                         Text(
@@ -89,6 +96,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                         FilteringTextInputFormatter.allow(
                             RegExp(r'[a-zA-Z0-9._]'))
                       ],
+
                       decoration: const InputDecoration(
                         labelText: "Username",
                         prefixIcon: Icon(
@@ -102,10 +110,11 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                     const SizedBox(
                       height: 5,
                     ),
-                    const Text(
-                      '*Username can only contain letters, numbers, ".", and "_"*',
-                      style: TextStyle(fontSize: 12.0),
-                    ),
+                    // if (errorUsername == true)
+                    //   const Text(
+                    //     '*Username can only contain letters, numbers, ".", and "_"*',
+                    //     style: TextStyle(fontSize: 12.0),
+                    //   ),
                     const SizedBox(height: kDefaultPadding / 2),
                     TextField(
                       controller: phoneNoController,
@@ -126,11 +135,12 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                     const SizedBox(
                       height: 5,
                     ),
-                    const Text(
-                      '*Phone number can only contain digits (0-9)',
-                      style: TextStyle(fontSize: 12.0),
-                      textAlign: TextAlign.left,
-                    ),
+                    // if (errorPhoneNo == true)
+                    //   const Text(
+                    //     '*Phone number can only contain digits (0-9)',
+                    //     style: TextStyle(fontSize: 12.0),
+                    //     textAlign: TextAlign.left,
+                    //   ),
                     const SizedBox(height: kDefaultPadding),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -146,11 +156,70 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            final newUserInfo = {
-                              "username": usernameController.text,
-                              "phoneNo": phoneNoController.text,
-                            };
-                            Navigator.pop(context, newUserInfo);
+                            // final newUserInfo = {
+                            //   "username": usernameController.text,
+                            //   "phoneNo": phoneNoController.text,
+                            // };
+                            if (usernameController.text == "" ||
+                                usernameController.text
+                                    .contains(RegExp(r'[^a-zA-Z0-9._]')) ||
+                                usernameController.text.length > 20 ||
+                                usernameController.text.length < 3) {
+                              // errorUsername = true;
+                              CoolAlert.show(
+                                context: context,
+                                type: CoolAlertType.error,
+                                title: "Error",
+                                text:
+                                    "Username can only contain letters, numbers, '.', and '_' and must be between 3-20 characters.",
+                              );
+                            }
+                            if (phoneNoController.text == "" ||
+                                phoneNoController.text
+                                    .contains(RegExp(r'[^0-9]')) ||
+                                phoneNoController.text.length != 10) {
+                              errorPhoneNo = true;
+                              CoolAlert.show(
+                                context: context,
+                                type: CoolAlertType.error,
+                                title: "Error",
+                                text:
+                                    "Phone number can only contain digits and must be 10 digits.",
+                              );
+                            }
+                            if (errorUsername == false &&
+                                errorPhoneNo == false) {
+                              loadingDialog(context);
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user.uid)
+                                  .update({
+                                "username": usernameController.text,
+                                "phoneNumber": phoneNoController.text,
+                              });
+
+                              Navigator.pop(context);
+                              CoolAlert.show(
+                                context: context,
+                                type: CoolAlertType.success,
+                                title: "Success",
+                                text: "Your account has been updated.",
+                                onConfirmBtnTap: () {
+                                  Navigator.pop(context);
+                                },
+                              );
+                            } else {
+                              setState(() {});
+                            }
+
+                            // FirebaseFirestore.instance
+                            //     .collection('users')
+                            //     .doc(user.uid)
+                            //     .update({
+                            //   "username": usernameController.text,
+                            //   "phoneNumber": phoneNoController.text,
+                            // });
+                            // Navigator.pop(context);
                           },
                           style: ButtonStyle(
                             backgroundColor:
@@ -177,8 +246,8 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
 
     if (updatedUserInfo != null) {
       setState(() {
-        _username = updatedUserInfo["username"] ?? "invalid username";
-        _phoneNo = updatedUserInfo["phoneNo"] ?? "invalid phone no.";
+        // _username = updatedUserInfo["username"] ?? "invalid username";
+        // _phoneNo = updatedUserInfo["phoneNo"] ?? "invalid phone no.";
       });
     }
   }
@@ -193,13 +262,14 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(kDefaultPadding / 2),
-        child: FutureBuilder(
-            future: FirebaseFirestore.instance
+        child: StreamBuilder(
+            stream: FirebaseFirestore.instance
                 .collection('users')
-                .where('email',
-                    isEqualTo: FirebaseAuth.instance.currentUser!.email)
-                .get(),
+                .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                .snapshots(),
             builder: (context, snapshot) {
+              final UserModel user =
+                  UserModel.fromFirestore(snapshot.data!.docs.first);
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Padding(
                   padding: const EdgeInsets.all(kDefaultPadding),
@@ -215,6 +285,11 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                   ),
                 );
               }
+              if (snapshot.hasError ||
+                  !snapshot.hasData ||
+                  snapshot.data == null) {
+                return const Center(child: Text("Something went wrong"));
+              }
 
               return Column(
                 children: [
@@ -226,7 +301,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                         margin: const EdgeInsets.only(left: kDefaultPadding),
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          _username,
+                          user.username,
                           style: Theme.of(context)
                               .textTheme
                               .headlineMedium
@@ -241,7 +316,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                           ),
                           side: const BorderSide(color: greyTextColor),
                         ),
-                        onPressed: _editUserInfo,
+                        onPressed: () => _editUserInfo(user),
                         child: const Icon(
                           Icons.edit,
                           color: greyTextColor,
@@ -269,7 +344,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        _email,
+                        user.email,
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
@@ -297,7 +372,7 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        _phoneNo,
+                        user.phoneNumber,
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
