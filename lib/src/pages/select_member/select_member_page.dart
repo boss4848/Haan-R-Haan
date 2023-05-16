@@ -37,7 +37,6 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
     } else {
       selectedFriends.value.add(friend);
     }
-    print("selectedFriends: ${selectedFriends.value}");
 
     selectedFriends.notifyListeners();
   }
@@ -55,11 +54,17 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
 
   Future<void> onDeleteParty() async {
     loadingDialog(context);
-    await _firestore.collection('parties').doc(widget.party.partyID).delete();
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
+
+    await _firestore
+        .collection('parties')
+        .doc(widget.party.partyID)
+        .delete()
+        .then((_) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    });
   }
 
   Future<void> onSubmit() async {
@@ -219,7 +224,7 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                             context: context,
                             sub: "SELECTED",
                             value: value.length,
-                            unit: "Friends",
+                            unit: "Members",
                           );
                         },
                       ),
@@ -228,11 +233,36 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                         height: 50,
                         color: greyBackgroundColor,
                       ),
-                      _buildStatus(
-                        context: context,
-                        sub: "JOIN BY LINK",
-                        value: 0,
-                        unit: "Members",
+                      StreamBuilder(
+                        stream: _firestore
+                            .collection('parties')
+                            .doc(widget.party.partyID)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return _buildStatus(
+                              context: context,
+                              sub: "JOIN BY LINK",
+                              value: 0,
+                              unit: "Members",
+                            );
+                          }
+
+                          // Check if the party document exists
+                          if (snapshot.hasData && snapshot.data!.exists) {
+                            return _buildStatus(
+                              context: context,
+                              sub: "JOIN BY LINK",
+                              value: List<dynamic>.from(
+                                      snapshot.data!['membersJoinedByLink'])
+                                  .length,
+                              unit: "Members",
+                            );
+                          } else {
+                            // Handle the case when the party document doesn't exist
+                            return Text('Party not found');
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -265,7 +295,8 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
               ),
               const SizedBox(height: 10),
               StreamBuilder<List<UserModel>>(
-                stream: Provider.of<FriendViewModel>(context).friendListStream,
+                stream: Provider.of<FriendViewModel>(context)
+                    .selectMembersStream(widget.party.partyID),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -300,64 +331,52 @@ class _SelectMemberPageState extends State<SelectMemberPage> {
                         ),
                         const SizedBox(height: 10),
                         ValueListenableBuilder<bool>(
-                            valueListenable: selectAll,
-                            builder: (context, value, child) {
-                              return InkWell(
-                                onTap: () => _handleSelectAll(snapshot.data!),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: value
-                                        ? greenPastelColor
-                                        : redPastelColor,
-                                    borderRadius: BorderRadius.circular(9),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        value
-                                            ? CupertinoIcons.minus
-                                            : CupertinoIcons.add,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        "Select all",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                          valueListenable: selectAll,
+                          builder: (context, value, child) {
+                            return InkWell(
+                              onTap: () => _handleSelectAll(snapshot.data!),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
                                 ),
-                              );
-                            }),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color:
+                                      value ? greenPastelColor : redPastelColor,
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      value
+                                          ? CupertinoIcons.minus
+                                          : CupertinoIcons.add,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Text(
+                                      "Select all",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     );
                   }
                 },
               ),
-              // Wrap(
-              //   spacing: 8,
-              //   runSpacing: 8,
-              //   children: const [
-              //     SizedBox(
-              //       width: double.infinity,
-              //       child: MemberItem(
-              //         name: "Select all",
-              //       ),
-              //     ),
-              //   ],
-              // ),
               const SizedBox(height: 20),
               Text(
                 "Or scan QR code to join",

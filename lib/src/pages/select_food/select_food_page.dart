@@ -216,6 +216,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                 snapshot.data?["ownerName"],
                 snapshot.data?["partyDesc"],
                 snapshot.data?["members"].length,
+                snapshot.data?["membersJoinedByLink"].length,
                 snapshot.data?["createdAt"],
               ),
             ],
@@ -231,6 +232,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
     String ownerName,
     String desc,
     int members,
+    int membersJoinedByLink,
     Timestamp createAt,
   ) {
     return Stack(
@@ -343,7 +345,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                         context: context,
                         sub: "IN THE PARTY",
                         value: members,
-                        unit: "Friends",
+                        unit: "Members",
                       ),
                       Container(
                         width: 1.2,
@@ -353,7 +355,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                       _buildStatus(
                         context: context,
                         sub: "JOIN BY LINK",
-                        value: 0,
+                        value: membersJoinedByLink,
                         unit: "Members",
                       ),
                       Container(

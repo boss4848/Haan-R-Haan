@@ -129,15 +129,27 @@ class BottomNavBar extends StatelessWidget {
                     String text = menuModel.label;
                     if (index == 2) {
                       return MapEntry(
-                          index,
-                          const SizedBox(
-                            width: 60,
-                          ));
+                        index,
+                        const SizedBox(
+                          width: 60,
+                        ),
+                      );
                     }
                     return MapEntry(
                       index,
                       GestureDetector(
-                        onTap: () => onTap(index),
+                        onTap: () {
+                          onTap(index);
+                          if (index == 3) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ScanPage(),
+                              ),
+                            );
+                            onTap(0);
+                          }
+                        },
                         child: Tab(
                           iconMargin: const EdgeInsets.all(0),
                           icon: const SizedBox(),

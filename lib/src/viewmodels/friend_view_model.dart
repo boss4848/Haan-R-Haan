@@ -136,6 +136,91 @@ class FriendViewModel extends ChangeNotifier {
     }
   }
 
+  Stream<List<UserModel>> get membersJoinedByLinkStream async* {
+    final UserViewModel userViewModel = UserViewModel();
+    final currentUser = await userViewModel.fetchUser();
+
+    // Subscribe to the friend list of the current user
+    final currentUserDoc = _firestore.collection('users').doc(currentUser.uid);
+    await for (var currentUserSnapshot in currentUserDoc.snapshots()) {
+      // Extract the friend list
+      final friendList =
+          List<String>.from(currentUserSnapshot.data()?['friendList'] ?? []);
+
+      // Fetch all the friend documents
+      List<Future<DocumentSnapshot<Map<String, dynamic>>>> friendDocs = [];
+      for (final friendID in friendList) {
+        final friendDoc = _firestore.collection('users').doc(friendID);
+        friendDocs.add(friendDoc.get());
+      }
+
+      // Wait for all the friend documents to be fetched
+      final friendSnapshots = await Future.wait(friendDocs);
+
+      // Convert to UserModel and yield
+      final friendsData = friendSnapshots
+          .map((snapshot) => UserModel.fromFirestore(snapshot))
+          .toList();
+      yield friendsData;
+    }
+  }
+
+  Stream<List<UserModel>> selectMembersStream(String partyID) async* {
+    final UserViewModel userViewModel = UserViewModel();
+    final currentUser = await userViewModel.fetchUser();
+
+    // Subscribe to the current user document
+    final currentUserDoc = _firestore.collection('users').doc(currentUser.uid);
+    await for (var currentUserSnapshot in currentUserDoc.snapshots()) {
+      // Extract the friend list
+      final friendList =
+          List<String>.from(currentUserSnapshot.data()?['friendList'] ?? []);
+
+      // Fetch all the friend documents
+      List<Future<DocumentSnapshot<Map<String, dynamic>>>> friendDocs = [];
+      for (final friendID in friendList) {
+        final friendDoc = _firestore.collection('users').doc(friendID);
+        friendDocs.add(friendDoc.get());
+      }
+
+      // Wait for all the friend documents to be fetched
+      final friendSnapshots = await Future.wait(friendDocs);
+
+      // Convert to UserModel
+      final friendsData = friendSnapshots
+          .map((snapshot) => UserModel.fromFirestore(snapshot))
+          .toList();
+
+      // Fetch 'membersJoinedByLink' from the 'parties' collection
+
+      final String partyId = partyID;
+      final partyDoc = _firestore.collection('parties').doc(partyId);
+      await for (var partySnapshot in partyDoc.snapshots()) {
+        final membersJoinedByLink = List<String>.from(
+            partySnapshot.data()?['membersJoinedByLink'] ?? []);
+
+        // Fetch all the member documents
+        List<Future<DocumentSnapshot<Map<String, dynamic>>>> memberDocs = [];
+        for (final memberId in membersJoinedByLink) {
+          final memberDoc = _firestore.collection('users').doc(memberId);
+          memberDocs.add(memberDoc.get());
+        }
+
+        // Wait for all the member documents to be fetched
+        final memberSnapshots = await Future.wait(memberDocs);
+
+        // Convert to UserModel
+        final membersData = memberSnapshots
+            .map((snapshot) => UserModel.fromFirestore(snapshot))
+            .toList();
+
+        // Combine friendsData and membersData and yield
+        final combinedData = [...friendsData, ...membersData];
+        yield combinedData; // Yield combined data
+      }
+    }
+  }
+
   Stream<List<UserModel>> get friendListStream async* {
     final UserViewModel userViewModel = UserViewModel();
     final currentUser = await userViewModel.fetchUser();

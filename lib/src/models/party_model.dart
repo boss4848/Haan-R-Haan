@@ -20,6 +20,7 @@ class PartyModel {
   final String ownerID;
   final String ownerName;
   final String promptpay;
+  final List<String> membersJoinedByLink;
 
   PartyModel({
     required this.partyID,
@@ -37,6 +38,7 @@ class PartyModel {
     required this.ownerID,
     required this.ownerName,
     required this.promptpay,
+    required this.membersJoinedByLink,
   });
   factory PartyModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -60,6 +62,7 @@ class PartyModel {
       // paymentList: [],
       foodList: List<Map<String, dynamic>>.from(data['foodList']),
       paymentList: List<Map<String, dynamic>>.from(data['paymentList']),
+      membersJoinedByLink: List<String>.from(data['membersJoinedByLink']),
       // foodList: List<FoodModel>.from(
       //   data['foodList']
       //           .map((item) => FoodModel.fromFirestore(item))
@@ -93,6 +96,7 @@ class PartyModel {
       'ownerID': ownerID,
       'ownerName': ownerName,
       'promptpay': promptpay,
+      'membersJoinedByLink': membersJoinedByLink,
     };
   }
 }

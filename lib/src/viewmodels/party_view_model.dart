@@ -78,6 +78,7 @@ class PartyViewModel with ChangeNotifier {
             ownerID: userData.uid,
             ownerName: userData.username,
             promptpay: promptpay,
+            membersJoinedByLink: [],
           ).toFirestore(),
         )
         .then((value) => value.update({
