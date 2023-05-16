@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../constant/constant.dart';
 import '../../../models/user_model.dart';
 import '../../../viewmodels/user_view_model.dart';
+import '../../scan/scan_page.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});
@@ -20,12 +20,22 @@ class CustomAppBar extends StatelessWidget {
       width: double.infinity,
       child: Row(
         children: [
-          Container(
-            height: appBarSize,
-            width: appBarSize,
-            decoration: boxShadow_1,
-            child: const Center(
-              child: Icon(CupertinoIcons.qrcode_viewfinder, size: 40),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ScanPage(),
+                ),
+              );
+            },
+            child: Container(
+              height: appBarSize,
+              width: appBarSize,
+              decoration: boxShadow_1,
+              child: const Center(
+                child: Icon(CupertinoIcons.qrcode_viewfinder, size: 40),
+              ),
             ),
           ),
           const SizedBox(width: 10),
