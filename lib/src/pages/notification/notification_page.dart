@@ -1,16 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:haan_r_haan/constant/constant.dart';
-import 'package:haan_r_haan/src/pages/bill_detail/owner_bill_detail/widgets/arrowBack.dart';
-import 'package:haan_r_haan/src/pages/notification/widget/noti_addfriend.dart';
-import 'package:haan_r_haan/src/pages/notification/widget/noti_billpaid.dart';
-import 'package:haan_r_haan/src/pages/notification/widget/noti_debt.dart';
-import 'package:haan_r_haan/src/pages/notification/widget/noti_group.dart';
-import 'package:haan_r_haan/src/pages/notification/widget/noti_overdued.dart';
+import 'package:haan_r_haan/src/pages/notification/widget/noti_item.dart';
+import 'package:haan_r_haan/src/viewmodels/noti_view_model.dart';
+import 'package:haan_r_haan/src/widgets/loading_dialog.dart';
+import '../../models/noti_model.dart';
 
 class NotificationPage extends StatelessWidget {
-  const NotificationPage({super.key});
+  final List<NotiModel> notiList;
+  const NotificationPage({super.key, required this.notiList});
 
   @override
   Widget build(BuildContext context) {
@@ -35,26 +33,39 @@ class NotificationPage extends StatelessWidget {
             horizontal: 20,
           ),
           child: Column(
-          children: [
-            const SizedBox(height: 160),
-            Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: Wrap(
-                runSpacing: 10,
-                children: const [
-                  NotiFriend(name: "Boss", time: "Tue 18 Apr 22:26"),
-                  NotiGroup(name: "Gift", time: "Tue 18 Apr 22:26", partyName: "Party name",),
-                  NotiOverdued(
-                      partyName: "GuGu chicken",
-                      money: "1,000",
-                      time: "Tue 18 Apr 22:26"),
-                  NotiDebt(partyNumber: "3", money: "190", time: "Tue 18 Apr 22:26"),
-                  NotiBillPaid(partyName: "Party name", money: "100", time: "Tue 18 Apr 22:26", name: "Boss")
-                ],
-              ),
-            )
-          ],
-        ),
+            children: [
+              const SizedBox(height: 160),
+              if (notiList.length > 5)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        loadingDialog(context);
+                        await NotiViewModel().clearAllNoti();
+                        // ignore: use_build_context_synchronously
+                        Navigator.pop(context);
+                        // ignore: use_build_context_synchronously
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Clear all",
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              const SizedBox(height: 15),
+              for (var noti in notiList)
+                NotiItem(
+                  title: noti.title,
+                  body: noti.body,
+                  dateCreated: noti.createdAt,
+                ),
+            ],
+          ),
         ),
       ),
     );

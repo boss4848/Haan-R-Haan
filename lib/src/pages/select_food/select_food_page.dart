@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/src/models/food_model.dart';
 import 'package:haan_r_haan/src/pages/select_member/widgets/member_item.dart';
+import 'package:haan_r_haan/src/viewmodels/noti_view_model.dart';
 import 'package:haan_r_haan/src/widgets/input_box.dart';
 import 'package:haan_r_haan/src/widgets/title.dart';
 import '../../../constant/constant.dart';
@@ -139,6 +140,17 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
           FirebaseFirestore.instance.collection('users').doc(eater).update({
             'userTotalDebt': FieldValue.increment(pricePerEater),
           });
+
+          //Update noti
+          //Update noti
+          NotiViewModel().updateNoti(
+            title: "New Expense Added",
+            body:
+                "Hey there! An expense of ${pricePerEater.toStringAsFixed(2)} has been added to your shared bill. Kindly check it out and settle your part when you can. Thanks!",
+            sender: FirebaseAuth.instance.currentUser!.uid,
+            receiver: eater,
+            type: "expense",
+          );
         }
       }
     }

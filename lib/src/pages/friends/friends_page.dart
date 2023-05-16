@@ -10,6 +10,7 @@ import 'package:haan_r_haan/src/widgets/title.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
+import '../../services/noti_service.dart';
 import '../../utils/format.dart';
 import '../../viewmodels/user_view_model.dart';
 import 'widgets/custom_appbar.dart';
@@ -62,6 +63,7 @@ class _FriendsPageState extends State<FriendsPage> {
       await friendViewModel.sendFriendRequest(
         userData.uid,
         friendID,
+        userData.username,
       );
 
       setState(() {
@@ -207,6 +209,24 @@ class _FriendsPageState extends State<FriendsPage> {
                     return Container();
                     // return const Center(child: Text('No friend requests.'));
                   } else {
+                    // If there are new friend requests, show a local notification
+                    for (var request in snapshot.data!) {
+                      if (!request['status'] && !request['request'].notified) {
+                        // if the request is pending and not notified
+                        // Show the local notification using NotiService
+                        NotiService().showNotification(
+                          title: 'New Friend Request',
+                          body:
+                              'You have a new friend request from ${request['senderDetails'].username}',
+                        );
+
+                        // Update the 'notified' field in Firestore
+                        FirebaseFirestore.instance
+                            .collection('friendRequests')
+                            .doc(request['id'])
+                            .update({'notified': true});
+                      }
+                    }
                     final requests = snapshot.data!;
 
                     return Column(
@@ -325,11 +345,6 @@ class _FriendsPageState extends State<FriendsPage> {
                         fontWeight: FontWeight.bold,
                         color: kSecondaryColor),
                   ),
-                  Icon(
-                    Icons.notifications,
-                    size: 36,
-                    color: Colors.white,
-                  )
                 ],
               ),
             ),

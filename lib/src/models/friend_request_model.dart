@@ -7,6 +7,7 @@ class FriendRequestModel {
   final List<String> combinedID;
   final Timestamp timestamp;
   final bool status;
+  final bool notified;
 
   FriendRequestModel({
     required this.id,
@@ -15,6 +16,7 @@ class FriendRequestModel {
     required this.combinedID,
     required this.timestamp,
     required this.status,
+    required this.notified,
   });
 
   factory FriendRequestModel.fromFirestore(DocumentSnapshot doc) {
@@ -26,6 +28,7 @@ class FriendRequestModel {
       combinedID: data['combinedID'].cast<String>(),
       timestamp: (data['timestamp'] as Timestamp),
       status: data['status'],
+      notified: data['notified'],
     );
   }
 }

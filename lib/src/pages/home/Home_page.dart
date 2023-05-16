@@ -1,11 +1,16 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/viewmodels/noti_view_model.dart';
 import 'package:haan_r_haan/src/widgets/shadow_container.dart';
 import '../../../constant/constant.dart';
+import '../../models/noti_model.dart';
 import '../../models/party_model.dart';
 import '../../models/user_model.dart';
+import '../../services/noti_service.dart';
 import '../../viewmodels/party_view_model.dart';
 import '../../viewmodels/user_view_model.dart';
+import '../notification/notification_page.dart';
 import './widget/custom_appbar.dart';
 import '../../widgets/title.dart';
 import 'widget/party_item.dart';
@@ -200,6 +205,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Container _buildBanner() {
+    final NotiViewModel noti = NotiViewModel();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
       height: 210,
@@ -266,15 +273,57 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: () {
-                  print("clicked");
+              StreamBuilder<Object>(
+                stream: noti.getNotificationStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.data == null) {
+                    return const Icon(
+                      Icons.notifications,
+                      size: 36,
+                      color: Colors.white,
+                    );
+                  } else {
+                    final List<NotiModel> notiList =
+                        snapshot.data as List<NotiModel>;
+                    //     // Iterate through all notifications
+                    for (var noti in notiList) {
+                      // If the notification is not notified yet
+                      if (!noti.notified) {
+                        // Show the local notification using your NotiService
+                        NotiService().showNotification(
+                          title: noti.title,
+                          body: noti.body,
+                        );
+
+                        // Update the 'notified' field in Firestore
+                        FirebaseFirestore.instance
+                            .collection('notifications')
+                            .doc(noti.notiId)
+                            .update({'notified': true});
+                      }
+                    }
+                    return IconButton(
+                      onPressed: () {
+                        print("clicked");
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            return NotificationPage(
+                              notiList: notiList,
+                            );
+                          },
+                        ));
+                      },
+                      icon: const Icon(
+                        Icons.notifications,
+                        size: 36,
+                        color: Colors.white,
+                      ),
+                    );
+                  }
                 },
-                icon: const Icon(
-                  Icons.notifications,
-                  size: 36,
-                  color: Colors.white,
-                ),
               )
             ],
           ),

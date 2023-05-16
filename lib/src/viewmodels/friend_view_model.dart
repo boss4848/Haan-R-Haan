@@ -3,14 +3,17 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/viewmodels/noti_view_model.dart';
 import 'package:haan_r_haan/src/viewmodels/user_view_model.dart';
 
 import '../models/friend_request_model.dart';
 import '../models/user_model.dart';
+import '../services/noti_service.dart';
 
 class FriendViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final NotiViewModel _noti = NotiViewModel();
 
   //Search user by username
   Future<List<UserModel>> searchUsers({
@@ -56,7 +59,8 @@ class FriendViewModel extends ChangeNotifier {
   }
 
 // Send friend request
-  Future<void> sendFriendRequest(String senderID, String receiverID) async {
+  Future<void> sendFriendRequest(
+      String senderID, String receiverID, String senderName) async {
     try {
       // Check if the friend request already exists
       QuerySnapshot querySnapshot = await _firestore
@@ -73,9 +77,28 @@ class FriendViewModel extends ChangeNotifier {
           'combinedID': [senderID, receiverID],
           'timestamp': Timestamp.now(),
           'status': false, // False means the request is pending
-          // 'isSeen': false, // False means the request is not seen yet
+          'notified': false, // False means the request is not seen yet
         });
+        // Create a new notification document
+        // String notificationId = _firestore.collection('notifications').doc().id;
 
+        // await _firestore.collection('notifications').doc(notificationId).set({
+        //   'title': 'Friend Request',
+        //   'body': 'You have a new friend request from $senderName',
+        //   'notificationId': notificationId,
+        //   'senderId': senderID,
+        //   'receiverId': receiverID,
+        //   'dateCreated': Timestamp.now(),
+        // });
+
+        // await _listenForFriendRequest(request.id);
+        NotiViewModel().updateNoti(
+          title: "New Friend Request",
+          body: "You have a new friend request from $senderName",
+          sender: senderID,
+          receiver: receiverID,
+          type: "friendRequest",
+        );
         notifyListeners();
       } else {
         //return friend request model
@@ -86,6 +109,46 @@ class FriendViewModel extends ChangeNotifier {
       // print(e);
       rethrow;
       // throw 'Friend request already exists';
+    }
+  }
+
+  Map<String, StreamSubscription> _friendRequestListeners = {};
+
+  Future<void> _listenForFriendRequest(String requestId) async {
+    // If there's already a listener for this requestId, don't add another one.
+    if (_friendRequestListeners.containsKey(requestId)) {
+      return;
+    }
+
+    _friendRequestListeners[requestId] = _firestore
+        .collection('friendRequests')
+        .doc(requestId)
+        .snapshots()
+        .listen((doc) async {
+      if (doc.exists && !doc['isSeen']) {
+        await _handleNewFriendRequest(doc);
+      }
+    });
+  }
+
+  Future<void> _handleNewFriendRequest(DocumentSnapshot doc) async {
+    final requestId = doc.id;
+    final isSeen = doc['isSeen'];
+
+    if (!isSeen) {
+      FriendRequestModel request = FriendRequestModel.fromFirestore(doc);
+      UserModel? senderDetails =
+          await UserViewModel().fetchUserByID(request.senderID);
+
+      if (senderDetails != null) {
+        NotiService().showNotification(
+          title: "New Friend Request",
+          body: "${senderDetails.username} has sent you a friend request.",
+        );
+        await _firestore.collection('friendRequests').doc(requestId).update(
+          {'isSeen': true},
+        );
+      }
     }
   }
 
@@ -136,34 +199,34 @@ class FriendViewModel extends ChangeNotifier {
     }
   }
 
-  Stream<List<UserModel>> get membersJoinedByLinkStream async* {
-    final UserViewModel userViewModel = UserViewModel();
-    final currentUser = await userViewModel.fetchUser();
+  // Stream<List<UserModel>> get membersJoinedByLinkStream async* {
+  //   final UserViewModel userViewModel = UserViewModel();
+  //   final currentUser = await userViewModel.fetchUser();
 
-    // Subscribe to the friend list of the current user
-    final currentUserDoc = _firestore.collection('users').doc(currentUser.uid);
-    await for (var currentUserSnapshot in currentUserDoc.snapshots()) {
-      // Extract the friend list
-      final friendList =
-          List<String>.from(currentUserSnapshot.data()?['friendList'] ?? []);
+  //   // Subscribe to the friend list of the current user
+  //   final currentUserDoc = _firestore.collection('users').doc(currentUser.uid);
+  //   await for (var currentUserSnapshot in currentUserDoc.snapshots()) {
+  //     // Extract the friend list
+  //     final friendList =
+  //         List<String>.from(currentUserSnapshot.data()?['friendList'] ?? []);
 
-      // Fetch all the friend documents
-      List<Future<DocumentSnapshot<Map<String, dynamic>>>> friendDocs = [];
-      for (final friendID in friendList) {
-        final friendDoc = _firestore.collection('users').doc(friendID);
-        friendDocs.add(friendDoc.get());
-      }
+  //     // Fetch all the friend documents
+  //     List<Future<DocumentSnapshot<Map<String, dynamic>>>> friendDocs = [];
+  //     for (final friendID in friendList) {
+  //       final friendDoc = _firestore.collection('users').doc(friendID);
+  //       friendDocs.add(friendDoc.get());
+  //     }
 
-      // Wait for all the friend documents to be fetched
-      final friendSnapshots = await Future.wait(friendDocs);
+  //     // Wait for all the friend documents to be fetched
+  //     final friendSnapshots = await Future.wait(friendDocs);
 
-      // Convert to UserModel and yield
-      final friendsData = friendSnapshots
-          .map((snapshot) => UserModel.fromFirestore(snapshot))
-          .toList();
-      yield friendsData;
-    }
-  }
+  //     // Convert to UserModel and yield
+  //     final friendsData = friendSnapshots
+  //         .map((snapshot) => UserModel.fromFirestore(snapshot))
+  //         .toList();
+  //     yield friendsData;
+  //   }
+  // }
 
   Stream<List<UserModel>> selectMembersStream(String partyID) async* {
     final UserViewModel userViewModel = UserViewModel();
@@ -270,6 +333,7 @@ class FriendViewModel extends ChangeNotifier {
           'status': request.status,
           'timestamp': request.timestamp,
           'senderDetails': senderDetails,
+          // 'notified': request.notified,
         });
       }
       yield friendRequests;
@@ -315,31 +379,38 @@ class FriendViewModel extends ChangeNotifier {
       UserModel? receiverDetails =
           await userViewModel.fetchUserByID(receiverId);
       // Add both users to each other's friends list
+      _noti.updateNoti(
+        title: "Friend Request Accepted",
+        body: "You are now friends with ${receiverDetails.username}",
+        receiver: senderId,
+        type: "friendRequest",
+        sender: receiverId,
+      );
       await _firestore.collection('users').doc(senderId).update({
         'friendList': FieldValue.arrayUnion([receiverId]),
-        'history': FieldValue.arrayUnion(
-          [
-            {
-              'type': 'friendRequest',
-              'title': 'Friend Request Accepted',
-              'message': 'You are now friends with ${receiverDetails.username}',
-              'timestamp': DateTime.now(),
-            }
-          ],
-        ),
+        // 'history': FieldValue.arrayUnion(
+        //   [
+        //     {
+        //       'type': 'friendRequest',
+        //       'title': 'Friend Request Accepted',
+        //       'message': 'You are now friends with ${receiverDetails.username}',
+        //       'timestamp': DateTime.now(),
+        //     }
+        //   ],
+        // ),
       });
       await _firestore.collection('users').doc(receiverId).update({
         'friendList': FieldValue.arrayUnion([senderId]),
-        'history': FieldValue.arrayUnion(
-          [
-            {
-              'type': 'friendRequest',
-              'title': 'Friend Request Accepted',
-              'message': 'You are now friends with ${senderDetails.username}',
-              'timestamp': DateTime.now(),
-            }
-          ],
-        ),
+        // 'history': FieldValue.arrayUnion(
+        //   [
+        //     {
+        //       'type': 'friendRequest',
+        //       'title': 'Friend Request Accepted',
+        //       'message': 'You are now friends with ${senderDetails.username}',
+        //       'timestamp': DateTime.now(),
+        //     }
+        //   ],
+        // ),
       });
 
       notifyListeners();

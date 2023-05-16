@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:haan_r_haan/src/viewmodels/noti_view_model.dart';
 import 'package:haan_r_haan/src/viewmodels/user_view_model.dart';
 import 'package:haan_r_haan/src/widgets/loading_dialog.dart';
 import 'package:promptpay_qrcode_generate/promptpay_qrcode_generate.dart';
@@ -428,21 +429,22 @@ class _BillDetailPageState extends State<BillDetailPage> {
                                 payerId: payerPayment['id'],
                                 partyId: widget.party.partyID,
                                 ownerId: parties['ownerID'],
+                                partyName: widget.party.partyName,
                               ),
                               FutureBuilder(
                                 future: UserViewModel().fetchUserByID(
                                   payerPayment['id'],
                                 ),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Text("Loading...");
-                                  }
-                                  if (!snapshot.hasData) {
+                                  // if (snapshot.connectionState ==
+                                  //     ConnectionState.waiting) {
+                                  //   return const Text("Loading...");
+                                  // }
+                                  if (snapshot.data == null) {
                                     return const Text("Loading...");
                                   }
                                   return Text(
-                                    snapshot.data?.username ?? 'Loading',
+                                    snapshot.data!.username,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: kPrimaryColor,
@@ -575,6 +577,7 @@ class PaymentCheckbox extends StatefulWidget {
   final String payerId;
   final String partyId;
   final String ownerId;
+  final String partyName;
 
   const PaymentCheckbox({
     super.key,
@@ -583,6 +586,7 @@ class PaymentCheckbox extends StatefulWidget {
     required this.payerId,
     required this.partyId,
     required this.ownerId,
+    required this.partyName,
   });
   @override
   State<PaymentCheckbox> createState() => _PaymentCheckboxState();
@@ -670,6 +674,18 @@ class _PaymentCheckboxState extends State<PaymentCheckbox> {
                             'userTotalLent':
                                 ownerData.userTotalLent + paymentAmount,
                           });
+
+                          //Updaet noti
+                          if (ownerData.uid != widget.payerId) {
+                            NotiViewModel().updateNoti(
+                              title: "You bill has been paid",
+                              body:
+                                  "${ownerData.username} has checked your ${paymentAmount.toStringAsFixed(2)} baht. Bill from ${widget.partyName}",
+                              sender: widget.ownerId,
+                              receiver: widget.payerId,
+                              type: "payment",
+                            );
+                          }
                         } else if (paidCount > 0) {
                           paidCount--;
                           totalLent -= paymentAmount;

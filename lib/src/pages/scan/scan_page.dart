@@ -12,6 +12,8 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import '../../../constant/constant.dart';
 import '../../models/party_model.dart';
+import '../../viewmodels/noti_view_model.dart';
+import '../../viewmodels/user_view_model.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -142,7 +144,7 @@ class _ScanPageState extends State<ScanPage> {
       child: Column(
         children: [
           Text(
-            barcode != null ? 'Result: ${barcode!.code}' : 'Scan a QR!',
+            barcode != null ? 'PartyID: ${barcode!.code}' : 'Scan a QR!',
             maxLines: 3,
           ),
           // ElevatedButton(
@@ -170,14 +172,18 @@ class _ScanPageState extends State<ScanPage> {
                     } else {
                       final party = PartyModel.fromFirestore(snapshot.data!);
 
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
                         if (!isNavigating) {
                           isNavigating = true;
                           controller?.pauseCamera();
 
+                          final user = await UserViewModel().fetchUser();
+
                           if (party.membersJoinedByLink.contains(
-                            FirebaseAuth.instance.currentUser!.uid,
-                          )) {
+                                FirebaseAuth.instance.currentUser!.uid,
+                              ) ||
+                              user.friendList.contains(party.ownerID)) {
+                            // ignore: use_build_context_synchronously
                             CoolAlert.show(
                               context: context,
                               type: CoolAlertType.error,
@@ -190,6 +196,7 @@ class _ScanPageState extends State<ScanPage> {
                               isNavigating = false;
                             });
                           } else {
+                            // ignore: use_build_context_synchronously
                             CoolAlert.show(
                               context: context,
                               type: CoolAlertType.confirm,
@@ -214,6 +221,24 @@ class _ScanPageState extends State<ScanPage> {
                                     .update({
                                   'membersJoinedByLink': membersJoinedByLink,
                                 });
+                                NotiViewModel().updateNoti(
+                                  title: "Joined party by QR code",
+                                  body: "You have joined ${party.partyName}",
+                                  sender: "",
+                                  receiver:
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                  type: "joinedParty",
+                                );
+
+                                NotiViewModel().updateNoti(
+                                  title: "Joined party by QR code",
+                                  body:
+                                      "${user.username} have joined ${party.partyName}",
+                                  sender:
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                  receiver: party.ownerID,
+                                  type: "joiendParty",
+                                );
                                 // notifyListeners();
                               },
                             ).then((_) {
