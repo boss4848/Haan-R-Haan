@@ -122,7 +122,7 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
             if (snapshot.hasError) {
               print("error: ${snapshot.error}");
             }
-            if (snapshot.data == null) {
+            if (snapshot.data!.docs.isEmpty) {
               return Column(
                 children: [
                   const TitleBar(
@@ -137,7 +137,7 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
                     child: Row(
                       children: [
                         Container(
-                          height: 110,
+                          height: 60,
                           width: 15,
                           decoration: const BoxDecoration(
                             color: greenPastelColor,

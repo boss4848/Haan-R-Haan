@@ -95,7 +95,7 @@ class _CreatePartyPageState extends State<CreatePartyPage> {
               if (!isPromptPay)
                 InputBox(
                   controller: phoneNumberController,
-                  errorText: "error",
+                  errorText: "",
                   label: "Phone Number",
                 ),
               const SizedBox(height: 20),
