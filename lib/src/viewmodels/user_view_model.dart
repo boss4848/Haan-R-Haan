@@ -12,6 +12,10 @@ class UserViewModel extends ChangeNotifier {
   UserViewModel() {
     _user = UserModel.empty();
   }
+  void clearUserData() {
+    _user = UserModel.empty();
+    notifyListeners();
+  }
 
   Future<UserModel> fetchUser() async {
     try {

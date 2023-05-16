@@ -86,6 +86,7 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _authService.signOut();
-    currentUser = null;
+    notifyListeners();
+    // currentUser = null;
   }
 }
