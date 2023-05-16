@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:haan_r_haan/constant/constant.dart';
 
 class ButtonOutlined extends StatelessWidget {
@@ -22,6 +20,7 @@ class ButtonOutlined extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
+        shadowColor: Colors.transparent,
         side: const BorderSide(color: kPrimaryColor),
       ),
       onPressed: () => onPressed,
