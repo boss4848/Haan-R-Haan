@@ -63,6 +63,7 @@ class NotificationPage extends StatelessWidget {
                   title: noti.title,
                   body: noti.body,
                   dateCreated: noti.createdAt,
+                  notiId: noti.notiId,
                 ),
             ],
           ),
