@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:haan_r_haan/constant/constant.dart';
 import 'package:haan_r_haan/src/pages/scan/rabert.dart';
@@ -143,9 +145,13 @@ class BottomNavBar extends StatelessWidget {
                           if (index == 3) {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => const ScanPage(),
-                              ),
+                              Platform.isIOS
+                                  ? MaterialPageRoute(
+                                      builder: (context) => const Raberd(),
+                                    )
+                                  : MaterialPageRoute(
+                                      builder: (context) => const ScanPage(),
+                                    ),
                             );
                             onTap(0);
                           }

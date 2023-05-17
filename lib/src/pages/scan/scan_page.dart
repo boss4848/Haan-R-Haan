@@ -34,6 +34,8 @@ class _ScanPageState extends State<ScanPage> {
     super.reassemble();
     if (Platform.isAndroid) {
       controller!.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller!.resumeCamera();
     }
     controller!.resumeCamera();
   }
