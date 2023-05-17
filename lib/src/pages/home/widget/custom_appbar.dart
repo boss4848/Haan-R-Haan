@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../constant/constant.dart';
 import '../../../models/user_model.dart';
 import '../../../viewmodels/user_view_model.dart';
@@ -72,13 +73,15 @@ class CustomAppBar extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           _buildStatus(
-                            image: "assets/images/dept.png",
+                            icon: "assets/icons/total.svg",
+                            iconColor: Colors.amber,
                             amount: user.userTotalDebt,
-                            title: "TOTAL DEPT",
+                            title: "TOTAL DEBT",
                           ),
                           const VerticalDivider(thickness: 1),
                           _buildStatus(
-                            image: "assets/images/bitcoin.png",
+                            icon: "assets/icons/lenting.svg",
+                            iconColor: redPastelColor,
                             amount: user.userTotalLent,
                             title: "TOTAL LENT",
                           ),
@@ -94,14 +97,21 @@ class CustomAppBar extends StatelessWidget {
   }
 
   Column _buildStatus(
-      {required String title, required String image, double amount = 0}) {
+      {required String title,
+      required String icon,
+      Color? iconColor,
+      double amount = 0}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Image.asset(image),
+            SvgPicture.asset(
+              icon,
+              width: 20,
+              color: iconColor,
+            ),
             const SizedBox(width: 10),
             Text(
               "${amount.toStringAsFixed(0)} ฿",

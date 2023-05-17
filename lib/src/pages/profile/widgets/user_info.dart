@@ -224,6 +224,12 @@ class _UserInfoWidgetState extends State<UserInfoWidget> {
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(kPrimaryColor),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                           ),
                           child: Text(
                             "Save",

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:haan_r_haan/src/viewmodels/noti_view_model.dart';
 import 'package:haan_r_haan/src/viewmodels/user_view_model.dart';
 import 'package:haan_r_haan/src/widgets/loading_dialog.dart';
@@ -267,6 +268,8 @@ class _BillDetailPageState extends State<BillDetailPage> {
                             sub: "TOTAL AMOUNT",
                             value: totalAmount.toInt(),
                             unit: "฿",
+                            //icon: "assets/icons/total.svg",
+                            //iconColor: greenPastelColor
                           ),
                           Container(
                             width: 1.2,
@@ -529,6 +532,8 @@ class _BillDetailPageState extends State<BillDetailPage> {
     required String sub,
     required int value,
     required String unit,
+    //String? icon,
+    //Color? iconColor,
   }) {
     return Expanded(
       child: Padding(
@@ -542,6 +547,11 @@ class _BillDetailPageState extends State<BillDetailPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                // SvgPicture.asset(
+                //   icon!,
+                //   color: iconColor,
+                //   width: 17,
+                // ),
                 Text(
                   "$value",
                   style: Theme.of(context).textTheme.labelMedium,

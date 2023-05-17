@@ -17,6 +17,9 @@ class PartyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final abdate =
+        date.replaceAll('hours', 'hrs').replaceAll('minutes', 'mins');
+
     return SizedBox(
         height: 65,
         width: double.infinity,
@@ -68,7 +71,7 @@ class PartyWidget extends StatelessWidget {
                       const SizedBox(
                         height: 5,
                       ),
-                      Text(date,
+                      Text(abdate,
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 10,

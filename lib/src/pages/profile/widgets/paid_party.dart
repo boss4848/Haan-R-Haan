@@ -229,6 +229,8 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
     required bool status,
     required Function navigator,
   }) {
+    final abSubtitle =
+        subTitle.length > 5 ? '${subTitle.substring(0, 5)}...' : subTitle;
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -266,7 +268,7 @@ class _PaidPartyWidgetState extends State<PaidPartyWidget> {
                   const SizedBox(width: 3),
                   Text(
                     // "· 6 members",
-                    subTitle,
+                    abSubtitle,
                     style: const TextStyle(
                       fontSize: 13,
                       color: kPrimaryColor,

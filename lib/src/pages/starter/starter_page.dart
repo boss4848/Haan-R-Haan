@@ -56,17 +56,24 @@ class _StartPageState extends State<StartPage> {
         decoration: const BoxDecoration(
           gradient: kDefaultBG,
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(50),
+        child: Padding(
+          padding: const EdgeInsets.all(kDefaultPadding),
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(),
-                Image.asset(
-                  "assets/images/logo.png",
-                  height: 240,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenWidth = constraints.maxWidth;
+                    final double logoHeight =
+                        screenWidth > 500 ? 240 : screenWidth * 0.48;
+                    return Image.asset(
+                      "assets/images/logo.png",
+                      height: logoHeight,
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 Image.asset(
