@@ -5,7 +5,7 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:haan_r_haan/src/pages/scan/join_party.dart';
+
 import 'package:haan_r_haan/src/widgets/loading.dart';
 import 'package:haan_r_haan/src/widgets/loading_dialog.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
