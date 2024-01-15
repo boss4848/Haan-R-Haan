@@ -54,4 +54,13 @@ flutter run
 ```
 This command will build and launch the app on the selected device.
 
+### Screens Example
+![StarterPage](https://raw.githubusercontent.com/boss4848/Haan-R-Haan/main/Starter%20Page.png)
+![AuthPage](https://raw.githubusercontent.com/boss4848/Haan-R-Haan/main/Create%20Account%20Page.png)
+![MainPage](https://raw.githubusercontent.com/boss4848/Haan-R-Haan/main/Main%20BG.png)
+![DetailPage](https://raw.githubusercontent.com/boss4848/Haan-R-Haan/main/Detail%20Page%20(member).png)
+
+
+
+
 
